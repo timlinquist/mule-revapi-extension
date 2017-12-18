@@ -350,4 +350,111 @@
             </plugin>
         </plugins>
     </build>
+
+    <repositories>
+        <repository>
+            <id>mule-releases</id>
+            <name>MuleSoft Releases</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/releases</url>
+        </repository>
+        <repository>
+            <id>mule-snapshots</id>
+            <name>MuleSoft Snapshot Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>mule-releases</id>
+            <name>MuleSoft Release Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/releases</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>mule-snapshots</id>
+            <name>MuleSoft Snapshot Repository</name>
+            <url>https://repository.mulesoft.org/nexus/content/repositories/snapshots/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <distributionManagement>
+        <repository>
+            <id>mule-releases</id>
+            <name>Mule Release Repository</name>
+            <url>https://repository-master.mulesoft.org/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>mule-snapshots</id>
+            <name>Mule Snapshot Repository</name>
+            <url>https://repository-master.mulesoft.org/nexus/content/repositories/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <properties>
+                <skipVerifications>false</skipVerifications>
+                <skipGpg>false</skipGpg>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <skip>${skipGpg}</skip>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <version>${maven.enforcer.plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>enforce-no-snapshots-in-deps</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireReleaseDeps>
+                                            <message>No Snapshots Allowed in Deps!</message>
+                                        </requireReleaseDeps>
+                                        <requireReleaseVersion>
+                                            <message>No Snapshots Allowed in Project Version!</message>
+                                        </requireReleaseVersion>
+                                        <requirePluginVersions>
+                                            <message>Best Practice is to always define plugin versions!</message>
+                                            <unCheckedPluginList>
+                                                org.apache.maven.plugins:maven-plugin-plugin,
+                                                org.apache.maven.plugins:maven-site-plugin,
+                                                org.apache.maven.plugins:maven-resources-plugin,
+                                                org.apache.maven.plugins:maven-jar-plugin,
+                                                org.apache.maven.plugins:maven-clean-plugin,
+                                                org.apache.maven.plugins:maven-install-plugin,
+                                                org.apache.maven.plugins:maven-deploy-plugin
+                                            </unCheckedPluginList>
+                                        </requirePluginVersions>
+                                    </rules>
+                                    <skip>${skipNoSnapshotsEnforcerPluginRule}</skip>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
