@@ -1,0 +1,10 @@
+{
+"code": "java.method.numberOfParametersChanged",
+"old": "method void org.bar.B::<init>()",
+"new": "method void org.bar.B::<init>(java.lang.String)",
+"package": "org.bar",
+"classSimpleName": "B",
+"methodName": "<init>",
+"elementKind": "constructor",
+"justification": ignored for testing pourposes
+}

@@ -1,1 +1,0 @@
-# mule-revapi-extension

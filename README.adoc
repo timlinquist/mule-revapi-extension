@@ -1,0 +1,33 @@
+== Mule Revapi Extension
+
+Used to analyze API changes between Mule module versions.
+
+It understands the `mule-module.properties` that defines Mule modules in jar files and will automatically exclude all elements
+that are not exported from analysis.
+
+=== Usage
+
+With Revapi Maven plugin:
+
+```xml
+
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.revapi</groupId>
+      <artifactId>revapi-maven-plugin</artifactId>
+      <version>...</version>
+      <dependencies>
+        <dependency>
+          <groupId>org.revapi</groupId>
+          <artifactId>revapi-java</artifactId>
+          <version>...</version>
+        </dependency>
+        <dependency>
+          <groupId>org.mule.tools.maven</groupId>
+          <artifactId>mule-revapi-extension</artifactId>
+          <version>...</version>
+        </dependency>
+      </dependencies>
+      ...
+```
