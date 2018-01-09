@@ -1,0 +1,3 @@
+org.mule.tools.revapi.transform.NoImplementApiAnnotationTransform
+org.mule.tools.revapi.transform.NoInstantiateApiAnnotationTransform
+org.mule.tools.revapi.transform.NoExtendApiAnnotationTransform

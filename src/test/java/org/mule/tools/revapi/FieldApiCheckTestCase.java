@@ -76,4 +76,15 @@ public class FieldApiCheckTestCase extends AbstractApiCheckTestCase {
   public void ignoresRemovedPrivateFieldOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedPrivateFieldOnExportedPackageClass");
   }
+
+  @Test
+  public void ignoresRemovedProtectedFieldOnExportedNoExtendPublicClass() throws Exception {
+    doUnmodifiedApiTest("ignoresRemovedProtectedFieldOnExportedNoExtendPublicClass");
+  }
+
+  @Test
+  public void detectsRemovedPublicFieldOnExportedNoExtendPublicClass() throws Exception {
+    String[] fieldRemovedError = getFieldRemovedError();
+    doBrokenApiTest("detectsRemovedPublicFieldOnExportedNoExtendPublicClass", fieldRemovedError);
+  }
 }

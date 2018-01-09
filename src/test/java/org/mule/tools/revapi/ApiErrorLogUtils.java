@@ -82,6 +82,7 @@ public class ApiErrorLogUtils {
   private static final String FIELD_NOW_FINAL = FIELD_PREFIX + "nowFinal";
   private static final String FIELD_REMOVED = FIELD_PREFIX + "removed";
   private static final String PARAM_MARKER = "===";
+  public static final String CONSTRUCTOR_METHOD = "<init>";
 
   private ApiErrorLogUtils() {}
 
@@ -402,7 +403,7 @@ public class ApiErrorLogUtils {
    * @return the expected error log lines for this error code
    */
   public static String[] getConstructorNumberOfParametersChangedError(String className, String oldParams, String newParams) {
-    String methodName = "<init>";
+    String methodName = CONSTRUCTOR_METHOD;
     String[] errorLog = new String[] {
         getErrorCodeLine(ApiErrorLogUtils.METHOD_NUMBER_OF_PARAMETERS_CHANGED),
         getOldElementLine(METHOD, getMethod(className, methodName, VOID, oldParams)),
@@ -479,6 +480,28 @@ public class ApiErrorLogUtils {
         getClassSimpleNameLine(className),
         getMethodNameLine(methodName),
         getElementKindLine(METHOD),
+        API_ERROR_JUSTIFICATION
+    };
+
+    return errorLog;
+  }
+
+  /**
+   * Generates error log for {@value METHOD_REMOVED }
+   *
+   * @return the expected error log lines for this error code
+   */
+  public static String[] getConstructorRemovedError() {
+    String className = ORG_FOO_A;
+    String methodName = CONSTRUCTOR_METHOD;
+    String params = STRING;
+    String[] errorLog = new String[] {
+        getErrorCodeLine(METHOD_REMOVED),
+        getOldElementLine(METHOD, getMethod(className, methodName, VOID, params)),
+        getPackageLine(className),
+        getClassSimpleNameLine(className),
+        getMethodNameLine(methodName),
+        getElementKindLine(CONSTRUCTOR),
         API_ERROR_JUSTIFICATION
     };
 

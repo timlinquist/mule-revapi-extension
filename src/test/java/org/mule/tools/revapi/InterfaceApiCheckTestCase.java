@@ -86,5 +86,15 @@ public class InterfaceApiCheckTestCase extends AbstractApiCheckTestCase {
   public void ignoresApiChangesInInterfaceInExportedPrivateInnerClass() throws Exception {
     doUnmodifiedApiTest("ignoresApiChangesInInterfaceInExportedPrivateInnerClass");
   }
+
+  @Test
+  public void ignoresApiChangesInExportedNoImplementInterfaceInPublicClass() throws Exception {
+    doUnmodifiedApiTest("ignoresApiChangesInExportedNoImplementInterfaceInPublicClass");
+  }
+
+  @Test
+  public void ignoresApiChangesInExportedInterfaceExtendingNoImplementInterface() throws Exception {
+    doUnmodifiedApiTest("ignoresApiChangesInExportedInterfaceExtendingNoImplementInterface");
+  }
 }
 

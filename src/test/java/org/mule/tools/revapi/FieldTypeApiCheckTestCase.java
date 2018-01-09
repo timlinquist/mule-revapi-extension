@@ -53,4 +53,16 @@ public class FieldTypeApiCheckTestCase extends AbstractApiCheckTestCase {
   public void ignoresTypeChangeInExportedPrivateInstanceField() throws Exception {
     doUnmodifiedApiTest("ignoresTypeChangeInExportedPrivateInstanceField");
   }
+
+  @Test
+  public void ignoresTypeChangeInExportedProtectedInstanceFieldFromNoExtendClass() throws Exception {
+    doUnmodifiedApiTest("ignoresTypeChangeInExportedProtectedInstanceFieldFromNoExtendClass");
+  }
+
+  @Test
+  public void detectsTypeChangeInExportedPublicInstanceFieldFromNoExtendClass() throws Exception {
+    String[] typeChangedError = getFieldTypeChangedError(ORG_FOO_A, B_FIELD);
+
+    doBrokenApiTest("detectsTypeChangeInExportedPublicInstanceFieldFromNoExtendClass", typeChangedError);
+  }
 }
