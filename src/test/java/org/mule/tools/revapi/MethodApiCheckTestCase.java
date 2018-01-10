@@ -139,4 +139,15 @@ public class MethodApiCheckTestCase extends AbstractApiCheckTestCase {
     String[] methodRemovedError = getMethodRemovedError();
     doBrokenApiTest("detectsRemovedPublicMethodOnExportedNoExtendPublicClass", methodRemovedError);
   }
+
+  @Test
+  public void detectsRemovedPublicMethodOnExportedNoInstantiatePublicClass() throws Exception {
+    String[] methodRemovedError = getMethodRemovedError();
+    doBrokenApiTest("detectsRemovedPublicMethodOnExportedNoInstantiatePublicClass", methodRemovedError);
+  }
+
+  @Test
+  public void ignoresRemovedProtectedMethodOnExportedNoInstantiatePublicClass() throws Exception {
+    doUnmodifiedApiTest("ignoresRemovedProtectedMethodOnExportedNoInstantiatePublicClass");
+  }
 }

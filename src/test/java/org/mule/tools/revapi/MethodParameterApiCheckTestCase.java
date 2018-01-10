@@ -146,4 +146,26 @@ public class MethodParameterApiCheckTestCase extends AbstractApiCheckTestCase {
     String[] numberOfParametersChangedError = getNumberOfParametersChangedError(STRING, EMPTY_PARAMS);
     doBrokenApiTest("detectsRemovedParameterInPublicMethodOnExportedPublicNoExtendClass", numberOfParametersChangedError);
   }
+
+  @Test
+  public void detectsAddedParameterInPublicMethodOnExportedPublicNoInstantiateClass() throws Exception {
+    String[] numberOfParametersChangedError = getNumberOfParametersChangedError(EMPTY_PARAMS, STRING);
+    doBrokenApiTest("detectsAddedParameterInPublicMethodOnExportedPublicNoInstantiateClass", numberOfParametersChangedError);
+  }
+
+  @Test
+  public void detectsRemovedParameterInPublicMethodOnExportedPublicNoInstantiateClass() throws Exception {
+    String[] numberOfParametersChangedError = getNumberOfParametersChangedError(STRING, EMPTY_PARAMS);
+    doBrokenApiTest("detectsRemovedParameterInPublicMethodOnExportedPublicNoInstantiateClass", numberOfParametersChangedError);
+  }
+
+  @Test
+  public void ignoresAddedParameterInProtectedMethodOnExportedPublicNoInstantiateClass() throws Exception {
+    doUnmodifiedApiTest("ignoresAddedParameterInProtectedMethodOnExportedPublicNoInstantiateClass");
+  }
+
+  @Test
+  public void ignoresRemovedParameterInProtectedMethodOnExportedPublicNoInstantiateClass() throws Exception {
+    doUnmodifiedApiTest("ignoresRemovedParameterInProtectedMethodOnExportedPublicNoInstantiateClass");
+  }
 }

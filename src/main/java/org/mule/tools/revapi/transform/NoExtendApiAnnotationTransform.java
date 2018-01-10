@@ -7,8 +7,6 @@
 
 package org.mule.tools.revapi.transform;
 
-import static javax.lang.model.element.ElementKind.CONSTRUCTOR;
-import static javax.lang.model.element.Modifier.PROTECTED;
 import static org.revapi.java.spi.Code.FIELD_REMOVED;
 import static org.revapi.java.spi.Code.FIELD_TYPE_CHANGED;
 import static org.revapi.java.spi.Code.METHOD_ADDED;
@@ -21,9 +19,6 @@ import org.mule.api.annotation.NoExtend;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.revapi.Element;
-import org.revapi.java.model.FieldElement;
-import org.revapi.java.model.MethodElement;
 import org.revapi.java.model.TypeElement;
 
 /**
@@ -31,26 +26,13 @@ import org.revapi.java.model.TypeElement;
  *
  * @since 1.1
  */
-public class NoExtendApiAnnotationTransform extends AbstractApiAnnotationTransform {
+public class NoExtendApiAnnotationTransform extends AbstractClassApiAnnotationTransform {
 
   /**
    * Creates a new transformer
    */
   public NoExtendApiAnnotationTransform() {
     super("mule.revapi.api.ignoreNoExtend");
-  }
-
-  @Override
-  protected String[] getDifferenceCodes() {
-    return new String[] {
-        FIELD_REMOVED.code(),
-        FIELD_TYPE_CHANGED.code(),
-        METHOD_REMOVED.code(),
-        METHOD_ADDED.code(),
-        METHOD_NUMBER_OF_PARAMETERS_CHANGED.code(),
-        METHOD_PARAMETER_TYPE_CHANGED.code(),
-        METHOD_RETURN_TYPE_CHANGED.code()
-    };
   }
 
   @Override
@@ -81,21 +63,5 @@ public class NoExtendApiAnnotationTransform extends AbstractApiAnnotationTransfo
   private boolean hasNoExtendAnnotation(TypeElement typeElement) {
     return isTypeWithAnnotation(typeElement.getTypeEnvironment().getTypeUtils(), typeElement.getModelRepresentation(),
                                 new ClassVisitor(NoExtend.class));
-  }
-
-  private boolean isProtectedMethod(Element element) {
-    return element instanceof MethodElement
-        && ((MethodElement) element).getDeclaringElement().getModifiers().contains(PROTECTED);
-  }
-
-  private boolean isProtectedConstructor(Element element) {
-    return element instanceof MethodElement
-        && ((MethodElement) element).getDeclaringElement().getKind().equals(CONSTRUCTOR)
-        && ((MethodElement) element).getDeclaringElement().getModifiers().contains(PROTECTED);
-  }
-
-  private boolean isProtectedField(Element element) {
-    return element instanceof FieldElement
-        && ((FieldElement) element).getDeclaringElement().getModifiers().contains(PROTECTED);
   }
 }

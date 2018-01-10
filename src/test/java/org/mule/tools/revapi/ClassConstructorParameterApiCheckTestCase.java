@@ -71,4 +71,19 @@ public class ClassConstructorParameterApiCheckTestCase extends AbstractApiCheckT
   public void ignoresTypeParameterChangeInPublicConstructorExportedNoInstantiatePublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresTypeParameterChangeInPublicConstructorExportedNoInstantiatePublicClass");
   }
+
+  @Test
+  public void ignoresAddedParameterToProtectedConstructorOnExportedNoInstantiatePublicClass() throws Exception {
+    doUnmodifiedApiTest("ignoresAddedParameterToProtectedConstructorOnExportedNoInstantiatePublicClass");
+  }
+
+  @Test
+  public void ignoresRemovedParameterToProtectedConstructorOnExportedNoInstantiatePublicClass() throws Exception {
+    doUnmodifiedApiTest("ignoresRemovedParameterToProtectedConstructorOnExportedNoInstantiatePublicClass");
+  }
+
+  @Test
+  public void ignoresTypeParameterChangeInProtectedConstructorExportedNoInstantiatePublicClass() throws Exception {
+    doUnmodifiedApiTest("ignoresTypeParameterChangeInProtectedConstructorExportedNoInstantiatePublicClass");
+  }
 }

@@ -62,4 +62,16 @@ public class MethodParameterTypeApiCheckTestCase extends AbstractApiCheckTestCas
     String[] parameterTypeChangedError = getParameterTypeChangedError(ORG_FOO_A, DO_STUFF_METHOD);
     doBrokenApiTest("detectsTypeParameterChangeInPublicMethodOnExportedNoExtendPublicClass", parameterTypeChangedError);
   }
+
+  @Test
+  public void ignoresTypeParameterChangeInProtectedMethodOnExportedNoInstantiatePublicClass() throws Exception {
+    doUnmodifiedApiTest("ignoresTypeParameterChangeInProtectedMethodOnExportedNoInstantiatePublicClass");
+  }
+
+
+  @Test
+  public void detectsTypeParameterChangeInPublicMethodOnExportedNoInstantiatePublicClass() throws Exception {
+    String[] parameterTypeChangedError = getParameterTypeChangedError(ORG_FOO_A, DO_STUFF_METHOD);
+    doBrokenApiTest("detectsTypeParameterChangeInPublicMethodOnExportedNoInstantiatePublicClass", parameterTypeChangedError);
+  }
 }

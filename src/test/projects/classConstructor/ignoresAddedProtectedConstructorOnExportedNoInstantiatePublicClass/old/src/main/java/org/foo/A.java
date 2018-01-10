@@ -6,9 +6,9 @@
  */
 package org.foo;
 
-import org.mule.api.annotation.NoExtend;
+import org.mule.api.annotation.NoInstantiate;
 
-@NoExtend
+@NoInstantiate
 public class A
 {
 

@@ -87,4 +87,15 @@ public class FieldApiCheckTestCase extends AbstractApiCheckTestCase {
     String[] fieldRemovedError = getFieldRemovedError();
     doBrokenApiTest("detectsRemovedPublicFieldOnExportedNoExtendPublicClass", fieldRemovedError);
   }
+
+  @Test
+  public void detectsRemovedPublicFieldOnExportedNoInstantiatePublicClass() throws Exception {
+    String[] fieldRemovedError = getFieldRemovedError();
+    doBrokenApiTest("detectsRemovedPublicFieldOnExportedNoInstantiatePublicClass", fieldRemovedError);
+  }
+
+  @Test
+  public void ignoresRemovedProtectedFieldOnExportedNoInstantiatedPublicClass() throws Exception {
+    doUnmodifiedApiTest("ignoresRemovedProtectedFieldOnExportedNoInstantiatedPublicClass");
+  }
 }

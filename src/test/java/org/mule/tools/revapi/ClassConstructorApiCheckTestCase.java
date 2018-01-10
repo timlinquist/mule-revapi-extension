@@ -35,12 +35,22 @@ public class ClassConstructorApiCheckTestCase extends AbstractApiCheckTestCase {
   }
 
   @Test
-  public void ignoresAddedProtectedConstructorOnExportedNoInstantiatePublicClass() throws Exception {
-    doUnmodifiedApiTest("ignoresAddedProtectedConstructorOnExportedNoInstantiatePublicClass");
+  public void ignoresAddedProtectedConstructorOnExportedNoExtendPublicClass() throws Exception {
+    doUnmodifiedApiTest("ignoresAddedProtectedConstructorOnExportedNoExtendPublicClass");
   }
 
   @Test
   public void ignoresAddedPublicConstructorOnExportedNoInstantiatePublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedPublicConstructorOnExportedNoInstantiatePublicClass");
+  }
+
+  @Test
+  public void ignoresRemovedProtectedConstructorOnExportedNoInstantiatePublicClass() throws Exception {
+    doUnmodifiedApiTest("ignoresRemovedProtectedConstructorOnExportedNoInstantiatePublicClass");
+  }
+
+  @Test
+  public void ignoresAddedProtectedConstructorOnExportedNoInstantiatePublicClass() throws Exception {
+    doUnmodifiedApiTest("ignoresAddedProtectedConstructorOnExportedNoInstantiatePublicClass");
   }
 }

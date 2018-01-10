@@ -85,4 +85,16 @@ public class MethodReturnTypeApiCheckTestCase extends AbstractApiCheckTestCase {
 
     doBrokenApiTest("detectsChangedReturnTypeInPublicMethodOnExportedPublicNoExtendClass", returnTypeChangedError);
   }
+
+  @Test
+  public void detectsChangedReturnTypeInPublicMethodOnExportedPublicNoInstantiateClass() throws Exception {
+    String[] returnTypeChangedError = getReturnTypeChangedError(ORG_FOO_A, DO_STUFF_METHOD);
+
+    doBrokenApiTest("detectsChangedReturnTypeInPublicMethodOnExportedPublicNoInstantiateClass", returnTypeChangedError);
+  }
+
+  @Test
+  public void ignoresChangedReturnTypeInProtectedMethodOnExportedPublicNoInstantiateClass() throws Exception {
+    doUnmodifiedApiTest("ignoresChangedReturnTypeInProtectedMethodOnExportedPublicNoInstantiateClass");
+  }
 }
