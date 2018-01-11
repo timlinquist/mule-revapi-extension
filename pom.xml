@@ -55,7 +55,7 @@
 
         <dependency>
             <groupId>org.mule.runtime</groupId>
-            <artifactId>mule-api-annotations</artifactId>
+            <artifactId>api-annotations</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
