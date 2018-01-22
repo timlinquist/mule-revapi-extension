@@ -11,7 +11,7 @@
     <description>Provides support for accepting API boundaries defined by Mule modules.</description>
 
     <properties>
-        <apiAnnotationsVersion>1.0.0-SNAPSHOT</apiAnnotationsVersion>
+        <apiAnnotationsVersion>1.0.0</apiAnnotationsVersion>
 
         <javaVersion>1.8</javaVersion>
         <revapi.skip>false</revapi.skip>
