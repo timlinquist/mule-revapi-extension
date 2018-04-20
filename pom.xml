@@ -119,26 +119,19 @@
         <maven>3.0.4</maven>
         <mavenVersion>2.2.1</mavenVersion>
         <doxiaVersion>1.4</doxiaVersion>
-        <pluginTestingVersion>2.1</pluginTestingVersion>
         <maven.surefire.plugin.version>2.18.1</maven.surefire.plugin.version>
         <maven-plugin-plugin.version>3.3</maven-plugin-plugin.version>
         <maven.api.version>3.0.4</maven.api.version>
         <takari.test.version>2.9.2</takari.test.version>
-        <publisher.version>v2-rev13-1.19.0</publisher.version>
-        <asm.version>5.0.4</asm.version>
         <jdk.version>1.8</jdk.version>
         <license.path>LICENSE_HEADER.txt</license.path>
-        <javaFormatter.plugin.version>2.0.1</javaFormatter.plugin.version>
         <license.maven.plugin.version>2.11</license.maven.plugin.version>
         <formatterGoal>validate</formatterGoal>
         <formatterConfigPath>formatter.xml</formatterConfigPath>
         <skipVerifications>false</skipVerifications>
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
-        <license.maven.plugin.version>2.11</license.maven.plugin.version>
-        <license.path>LICENSE_HEADER.txt</license.path>
         <javaFormatter.plugin.version>1.9.0</javaFormatter.plugin.version>
-        <formatterConfigPath>formatter.xml</formatterConfigPath>
     </properties>
 
     <dependencies>
