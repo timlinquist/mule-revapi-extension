@@ -110,7 +110,7 @@
     </developers>
 
     <properties>
-        <apiAnnotationsVersion>1.1.1-20200720</apiAnnotationsVersion>
+        <apiAnnotationsVersion>1.1.1-20200727</apiAnnotationsVersion>
 
         <javaVersion>1.8</javaVersion>
         <revapi.skip>false</revapi.skip>
