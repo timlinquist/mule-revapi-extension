@@ -131,7 +131,7 @@
         <skipVerifications>false</skipVerifications>
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
         <maven.enforcer.plugin.version>1.4.1</maven.enforcer.plugin.version>
-        <javaFormatter.plugin.version>1.9.0</javaFormatter.plugin.version>
+        <javaFormatter.plugin.version>2.14.0</javaFormatter.plugin.version>
         <maven.site.plugin.version>3.9.0</maven.site.plugin.version>
     </properties>
 
@@ -435,13 +435,13 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.marvinformatics.formatter</groupId>
+                <groupId>net.revelc.code.formatter</groupId>
                 <artifactId>formatter-maven-plugin</artifactId>
                 <version>${javaFormatter.plugin.version}</version>
                 <configuration>
-                    <compilerCompliance>${javaVersion}</compilerCompliance>
-                    <compilerSource>${javaVersion}</compilerSource>
-                    <compilerTargetPlatform>${javaVersion}</compilerTargetPlatform>
+                    <compilerCompliance>${jdk.version}</compilerCompliance>
+                    <compilerSource>${jdk.version}</compilerSource>
+                    <compilerTargetPlatform>${jdk.version}</compilerTargetPlatform>
                     <configFile>${basedir}/${formatterConfigPath}</configFile>
                     <configJsFile>${basedir}/${formatterConfigPath}</configJsFile>
                     <aggregator>false</aggregator>
@@ -449,7 +449,6 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>apply-format</id>
                         <phase>compile</phase>
                         <goals>
                             <goal>${formatterGoal}</goal>

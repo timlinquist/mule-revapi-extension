@@ -13,8 +13,8 @@ import static java.lang.String.format;
  * Provides utilities to create error messages lines that can be used to match against the real log generated during the Maven
  * Revapi plugin.
  * <p/>
- * NOTE: errors messages have different values that can be parameterized, but this utilities parametrize only the values that
- * need to be variable according to the current test suite.
+ * NOTE: errors messages have different values that can be parameterized, but this utilities parametrize only the values that need
+ * to be variable according to the current test suite.
  */
 public class ApiErrorLogUtils {
 
@@ -127,7 +127,7 @@ public class ApiErrorLogUtils {
   /**
    * Generates error log for {@value CLASS_NOW_FINAL }
    *
-   * @param className name of the modified class
+   * @param className    name of the modified class
    * @param oldModifiers class modifiers declared in the old version of the class
    * @param newModifiers class modifiers declared in the new version of the class
    * @return the expected error log lines for this error code
@@ -151,7 +151,7 @@ public class ApiErrorLogUtils {
   /**
    * Generates error log for {@value CLASS_VISIBILITY_REDUCED }
    *
-   * @param className name of the modified class
+   * @param className     name of the modified class
    * @param oldVisibility class visibility declared in the old version of the class
    * @param newVisibility class visibility declared in the new version of the class
    * @return the expected error log lines for this error code
@@ -174,7 +174,7 @@ public class ApiErrorLogUtils {
   /**
    * Generates error log for {@value CLASS_NO_LONGER_INHERITS_FROM_CLASS}
    *
-   * @param className name of the modified class
+   * @param className      name of the modified class
    * @param superClassName name of the superclass declared in the old version of {@code className}
    * @return the expected error log lines for this error code
    */
@@ -196,7 +196,7 @@ public class ApiErrorLogUtils {
   /**
    * Generates error log for {@value CLASS_NON_FINAL_CLASS_INHERITS_FROM_NEW_CLASS }
    *
-   * @param className name of the modified class
+   * @param className      name of the modified class
    * @param superClassName name of the superclass declared in the new version of {@code className}
    * @return the expected error log lines for this error code
    */
@@ -218,7 +218,7 @@ public class ApiErrorLogUtils {
   /**
    * Generates error log for {@value METHOD_PARAMETER_TYPE_CHANGED }
    *
-   * @param className name of the modified class
+   * @param className  name of the modified class
    * @param methodName name of the method that changed in the new version of {@code className}
    * @return the expected error log lines for this error code
    */
@@ -248,7 +248,7 @@ public class ApiErrorLogUtils {
   /**
    * Generates error log for {@value METHOD_RETURN_TYPE_CHANGED }
    *
-   * @param className name of the modified class
+   * @param className  name of the modified class
    * @param methodName name of the method that changed in the new version of {@code className}
    * @return the expected error log lines for this error code
    */
