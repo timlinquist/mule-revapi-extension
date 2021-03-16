@@ -9,9 +9,11 @@ package org.mule.tools.revapi;
 
 import static java.io.File.separator;
 import static java.lang.System.getProperty;
+import static java.nio.file.Files.copy;
+import static java.nio.file.Files.createDirectories;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.io.FileUtils.copyFile;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
@@ -21,10 +23,12 @@ import static org.mule.tools.revapi.ApiErrorLogUtils.API_ERROR_JUSTIFICATION;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import io.takari.maven.testing.TestResources;
 import io.takari.maven.testing.executor.MavenExecutionResult;
@@ -36,9 +40,8 @@ import org.junit.runner.RunWith;
 @RunWith(MavenJUnitTestRunner.class)
 public abstract class AbstractApiCheckTestCase {
 
-  private static final String INFO_LOG_PREFIX = "[INFO] ";
-  private static final String sectionSeparator = INFO_LOG_PREFIX +
-      "------------------------------------------------------------------------";
+  private static final Pattern moduleTitleStart = Pattern.compile("\\[INFO\\]\\s-+<.*>-+");
+  private static final Pattern reactorSummaryStart = Pattern.compile("\\[INFO\\]\\s-+");
   private static final String MAVEN_BUILD_PREFIX = "[INFO] Building ";
   private static final String API_ERROR_FOUND = "The following API problems caused the build to fail:";
   private static final String REACTOR_SUMMARY = "Reactor Summary";
@@ -51,7 +54,8 @@ public abstract class AbstractApiCheckTestCase {
   private final String folder;
 
   public AbstractApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, String folder) throws Exception {
-    this.mavenRuntime = builder.build();
+    this.mavenRuntime =
+        builder.withCliOptions("--batch-mode", "-Dmaven.repo.local=" + getProperty("maven.repo.local", "")).build();
     this.folder = folder;
   }
 
@@ -86,9 +90,9 @@ public abstract class AbstractApiCheckTestCase {
 
   private MavenExecutionResult runMaven(String projectName) throws Exception {
     // To reuse a parent pom, it has to be manually copied to the expected folder
-    File parentPomFile = Paths.get(getProperty("user.dir"), "src/test/projects/parent/pom.xml").toFile();
-    File parentProjectFolder = new File(resources.getBasedir().getParent(), "parent");
-    copyFile(parentPomFile, new File(parentProjectFolder, "pom.xml"));
+    Path parentPomFile = Paths.get(getProperty("user.dir"), "src/test/projects/parent/pom.xml");
+    Path parentProjectFolder = new File(resources.getBasedir().getParent(), "parent").toPath();
+    copy(parentPomFile, Paths.get(createDirectories(parentProjectFolder).toString(), "pom.xml"), REPLACE_EXISTING);
 
     File basedir = resources.getBasedir(folder + separator + projectName);
     return mavenRuntime.forProject(basedir).execute("install");
@@ -100,13 +104,14 @@ public abstract class AbstractApiCheckTestCase {
     int i = 0;
     while (i < logLines.size()) {
       String currentLine = logLines.get(i);
-      if (sectionSeparator.equals(currentLine)) {
+      if (moduleTitleStart.matcher(currentLine).find() || reactorSummaryStart.matcher(currentLine).find()) {
         if (i + 1 < logLines.size() && logLines.get(i + 1).startsWith(MAVEN_BUILD_PREFIX)) {
           int moduleLogStart = i;
           String moduleName = logLines.get(i + 1).substring(MAVEN_BUILD_PREFIX.length());
           i = i + 3;
 
-          while (i < logLines.size() && !(logLines.get(i).equals(sectionSeparator))) {
+          while (i < logLines.size() && !(moduleTitleStart.matcher(logLines.get(i)).find())
+              && !(reactorSummaryStart.matcher(logLines.get(i)).find())) {
             i++;
           }
 

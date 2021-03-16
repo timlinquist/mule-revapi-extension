@@ -34,7 +34,7 @@ public class ApiErrorLogUtils {
   static final String DO_STUFF_METHOD = "doStuff";
   static final String B_FIELD = "b";
   static final String API_ERROR_JUSTIFICATION =
-      "[ERROR] \"justification\": <<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>";
+      "[ERROR]   \"justification\": <<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>";
 
   static final String PACKAGE = "package";
   static final String PRIVATE = "private";
@@ -654,66 +654,66 @@ public class ApiErrorLogUtils {
   }
 
   private static String getClassSimpleNameLine(String className) {
-    return "[ERROR] \"classSimpleName\": \"" + getSimpleName(className) + "\",";
+    return "[ERROR]   \"classSimpleName\": \"" + getSimpleName(className) + "\",";
   }
 
   private static String getPackageLine(String className) {
-    return "[ERROR] \"package\": \"" + getPackageName(className) + "\",";
+    return "[ERROR]   \"package\": \"" + getPackageName(className) + "\",";
   }
 
   private static String getErrorCodeLine(String errorCode) {
-    return format("[ERROR] \"code\": \"%s\",", errorCode);
+    return format("[ERROR]   \"code\": \"%s\",", errorCode);
   }
 
   private static String getOldModifiersLine(String oldModifiers) {
-    return format("[ERROR] \"oldModifiers\": \"%s\",", oldModifiers);
+    return format("[ERROR]   \"oldModifiers\": \"%s\",", oldModifiers);
   }
 
   private static String getNewModifiersLine(String newModifiers) {
-    return format("[ERROR] \"newModifiers\": \"%s\",", newModifiers);
+    return format("[ERROR]   \"newModifiers\": \"%s\",", newModifiers);
   }
 
   private static String getNewVisibilityLine(String newVisibility) {
-    return format("[ERROR] \"newVisibility\": \"%s\",", newVisibility);
+    return format("[ERROR]   \"newVisibility\": \"%s\",", newVisibility);
   }
 
   private static String getOldVisibilityLine(String oldVisibility) {
-    return format("[ERROR] \"oldVisibility\": \"%s\",", oldVisibility);
+    return format("[ERROR]   \"oldVisibility\": \"%s\",", oldVisibility);
   }
 
   private static String getSuperClassLine(String superClassName) {
-    return format("[ERROR] \"superClass\": \"%s\",", superClassName);
+    return format("[ERROR]   \"superClass\": \"%s\",", superClassName);
   }
 
   private static String getOldElementLine(String type, String element) {
-    return format("[ERROR] \"old\": \"%s %s\",", type, element);
+    return format("[ERROR]   \"old\": \"%s %s\",", type, element);
   }
 
   private static String getNewElementLine(String type, String element) {
-    return format("[ERROR] \"new\": \"%s %s\",", type, element);
+    return format("[ERROR]   \"new\": \"%s %s\",", type, element);
   }
 
   private static String getFieldNameLine(String fieldName) {
-    return format("[ERROR] \"fieldName\": \"%s\",", fieldName);
+    return format("[ERROR]   \"fieldName\": \"%s\",", fieldName);
   }
 
   private static String getMethodNameLine(String methodName) {
-    return format("[ERROR] \"methodName\": \"%s\",", methodName);
+    return format("[ERROR]   \"methodName\": \"%s\",", methodName);
   }
 
   private static String getOldTypeLine(String type) {
-    return format("[ERROR] \"oldType\": \"%s\",", type);
+    return format("[ERROR]   \"oldType\": \"%s\",", type);
   }
 
   private static String getNewTypeLine(String type) {
-    return format("[ERROR] \"newType\": \"%s\",", type);
+    return format("[ERROR]   \"newType\": \"%s\",", type);
   }
 
   private static String getElementKindLine(String elementKind) {
-    return format("[ERROR] \"elementKind\": \"%s\",", elementKind);
+    return format("[ERROR]   \"elementKind\": \"%s\",", elementKind);
   }
 
   private static String getParameterIndexLine(int index) {
-    return format("[ERROR] \"parameterIndex\": \"%s\",", index);
+    return format("[ERROR]   \"parameterIndex\": \"%s\",", index);
   }
 }
