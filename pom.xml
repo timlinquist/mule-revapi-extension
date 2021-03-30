@@ -76,9 +76,9 @@
         <revapi.skip>false</revapi.skip>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <revapi-basic-features.version>0.6.3</revapi-basic-features.version>
-        <revapi-java.version>0.14.4</revapi-java.version>
-        <revapi-java-spi.version>0.14.0</revapi-java-spi.version>
+        <revapi-basic-features.version>0.11.2</revapi-basic-features.version>
+        <revapi-java.version>0.15.1</revapi-java.version>
+        <revapi-java-spi.version>0.15.1</revapi-java-spi.version>
         <takari.test.version>3.0.0</takari.test.version>
         <junit.version>4.13.2</junit.version>
         <hamcrest-core.version>2.2</hamcrest-core.version>
