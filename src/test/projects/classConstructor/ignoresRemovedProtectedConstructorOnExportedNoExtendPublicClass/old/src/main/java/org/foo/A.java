@@ -12,7 +12,10 @@ import org.mule.api.annotation.NoExtend;
 public class A
 {
 
-  protected A(String a) {
+  public A() {
 
+  }
+
+  protected A(String a) {
   }
 }

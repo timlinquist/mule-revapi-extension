@@ -14,6 +14,7 @@ import static org.revapi.java.spi.Code.METHOD_NUMBER_OF_PARAMETERS_CHANGED;
 import static org.revapi.java.spi.Code.METHOD_PARAMETER_TYPE_CHANGED;
 import static org.revapi.java.spi.Code.METHOD_REMOVED;
 import static org.revapi.java.spi.Code.METHOD_RETURN_TYPE_CHANGED;
+
 import org.mule.api.annotation.NoExtend;
 
 import java.util.HashMap;

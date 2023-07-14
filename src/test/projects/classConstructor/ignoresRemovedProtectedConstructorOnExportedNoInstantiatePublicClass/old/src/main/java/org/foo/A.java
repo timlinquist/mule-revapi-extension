@@ -12,6 +12,10 @@ import org.mule.api.annotation.NoInstantiate;
 public class A
 {
 
+  public A() {
+
+  }
+
   protected A(String a) {
 
   }

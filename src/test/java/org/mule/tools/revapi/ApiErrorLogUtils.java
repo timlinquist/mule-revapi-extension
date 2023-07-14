@@ -34,7 +34,7 @@ public class ApiErrorLogUtils {
   static final String DO_STUFF_METHOD = "doStuff";
   static final String B_FIELD = "b";
   static final String API_ERROR_JUSTIFICATION =
-      "[ERROR]   \"justification\": <<<<< ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE >>>>>";
+      "\"justification\": \"ADD YOUR EXPLANATION FOR THE NECESSITY OF THIS CHANGE\"";
 
   static final String PACKAGE = "package";
   static final String PRIVATE = "private";
@@ -70,6 +70,7 @@ public class ApiErrorLogUtils {
   private static final String FIELD_PREFIX = JAVA_PREFIX + FIELD + CODE_SEPARATOR;
   private static final String FIELD_TYPE_CHANGED = FIELD_PREFIX + "typeChanged";
   private static final String METHOD_VISIBILITY_REDUCED = METHOD_PREFIX + "visibilityReduced";
+  private static final String METHOD_VISIBILITY_INCREASED = METHOD_PREFIX + "visibilityIncreased";
   private static final String METHOD_NOW_STATIC = METHOD_PREFIX + "nowStatic";
   private static final String METHOD_NO_LONGER_STATIC = METHOD_PREFIX + "noLongerStatic";
   private static final String METHOD_NUMBER_OF_PARAMETERS_CHANGED = METHOD_PREFIX + "numberOfParametersChanged";
@@ -96,10 +97,10 @@ public class ApiErrorLogUtils {
     String[] errorLog = new String[] {
         getErrorCodeLine(CLASS_REMOVED),
         getOldElementLine(CLASS, className),
+        API_ERROR_JUSTIFICATION,
         getPackageLine(className),
         getClassSimpleNameLine(className),
-        getElementKindLine(CLASS),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(CLASS)
     };
 
     return errorLog;
@@ -115,10 +116,10 @@ public class ApiErrorLogUtils {
     String[] errorLog = new String[] {
         getErrorCodeLine(CLASS_ADDED),
         getNewElementLine(CLASS, className),
+        API_ERROR_JUSTIFICATION,
         getPackageLine(className),
         getClassSimpleNameLine(className),
-        getElementKindLine(CLASS),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(CLASS)
     };
 
     return errorLog;
@@ -137,12 +138,12 @@ public class ApiErrorLogUtils {
         getErrorCodeLine(CLASS_NOW_FINAL),
         getOldElementLine(CLASS, className),
         getNewElementLine(CLASS, className),
+        API_ERROR_JUSTIFICATION,
         getOldModifiersLine(oldModifiers),
         getNewModifiersLine(newModifiers),
         getPackageLine(className),
         getClassSimpleNameLine(className),
-        getElementKindLine(CLASS),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(CLASS)
     };
 
     return errorLog;
@@ -163,10 +164,10 @@ public class ApiErrorLogUtils {
         getNewElementLine(CLASS, className),
         getOldVisibilityLine(oldVisibility),
         getNewVisibilityLine(newVisibility),
+        API_ERROR_JUSTIFICATION,
         getPackageLine(className),
         getClassSimpleNameLine(className),
-        getElementKindLine(CLASS),
-        API_ERROR_JUSTIFICATION};
+        getElementKindLine(CLASS)};
 
     return errorLog;
   }
@@ -183,11 +184,11 @@ public class ApiErrorLogUtils {
         getErrorCodeLine(CLASS_NO_LONGER_INHERITS_FROM_CLASS),
         getOldElementLine(CLASS, className),
         getNewElementLine(CLASS, className),
+        API_ERROR_JUSTIFICATION,
         getSuperClassLine(superClassName),
         getPackageLine(className),
         getClassSimpleNameLine(className),
-        getElementKindLine(CLASS),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(CLASS)
     };
 
     return errorLog;
@@ -206,10 +207,10 @@ public class ApiErrorLogUtils {
         getOldElementLine(CLASS, className),
         getNewElementLine(CLASS, className),
         getSuperClassLine(superClassName),
+        API_ERROR_JUSTIFICATION,
         getPackageLine(className),
         getClassSimpleNameLine(className),
-        getElementKindLine(CLASS),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(CLASS)
     };
 
     return errorLog;
@@ -232,14 +233,14 @@ public class ApiErrorLogUtils {
         getErrorCodeLine(METHOD_PARAMETER_TYPE_CHANGED),
         getOldElementLine(PARAMETER, getMethod(className, methodName, VOID, oldParams)),
         getNewElementLine(PARAMETER, getMethod(className, methodName, VOID, newParams)),
+        getParameterIndexLine(0),
+        API_ERROR_JUSTIFICATION,
         getOldTypeLine(oldType),
         getNewTypeLine(newType),
         getPackageLine(className),
         getClassSimpleNameLine(className),
         getMethodNameLine(methodName),
-        getParameterIndexLine(0),
-        getElementKindLine(PARAMETER),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(PARAMETER)
     };
 
     return errorLog;
@@ -259,13 +260,13 @@ public class ApiErrorLogUtils {
         getErrorCodeLine(METHOD_RETURN_TYPE_CHANGED),
         getOldElementLine(METHOD, getMethod(className, methodName, oldType, EMPTY_PARAMS)),
         getNewElementLine(METHOD, getMethod(className, methodName, newType, EMPTY_PARAMS)),
+        API_ERROR_JUSTIFICATION,
         getOldTypeLine(oldType),
         getNewTypeLine(newType),
         getPackageLine(className),
         getClassSimpleNameLine(className),
         getMethodNameLine(methodName),
-        getElementKindLine(METHOD),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(METHOD)
     };
     return errorLog;
   }
@@ -282,13 +283,13 @@ public class ApiErrorLogUtils {
         getErrorCodeLine(FIELD_TYPE_CHANGED),
         getOldElementLine(FIELD, getFieldName(className, fieldName)),
         getNewElementLine(FIELD, getFieldName(className, fieldName)),
+        API_ERROR_JUSTIFICATION,
         getOldTypeLine(ORG_BAR_B),
         getNewTypeLine(STRING),
         getPackageLine(className),
         getClassSimpleNameLine(className),
         getFieldNameLine(fieldName),
-        getElementKindLine(FIELD),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(FIELD)
     };
     return errorLog;
   }
@@ -308,15 +309,68 @@ public class ApiErrorLogUtils {
         getErrorCodeLine(METHOD_VISIBILITY_REDUCED),
         getOldElementLine(METHOD, getMethod(className, methodName, VOID, EMPTY_PARAMS)),
         getNewElementLine(METHOD, getMethod(className, methodName, VOID, EMPTY_PARAMS)),
+        API_ERROR_JUSTIFICATION,
         getOldVisibilityLine(oldVisibility),
         getNewVisibilityLine(newVisibility),
         getPackageLine(className),
         getClassSimpleNameLine(className),
         getMethodNameLine(methodName),
-        getElementKindLine(METHOD),
-        API_ERROR_JUSTIFICATION};
+        getElementKindLine(METHOD)};
 
     return errorLog;
+  }
+
+  /**
+   * Generates error log for {@value METHOD_VISIBILITY_INCREASED}
+   *
+   * @param oldVisibility method visibility declared in the old version of the class
+   * @param newVisibility method visibility declared in the new version of the class
+   * @return the expected error log lines for this error code
+   */
+  public static String[] getMethodVisibilityIncreasedError(String oldVisibility, String newVisibility) {
+    String className = ORG_FOO_A;
+    String methodName = DO_STUFF_METHOD;
+
+    String[] errorLog = new String[] {
+        getErrorCodeLine(METHOD_VISIBILITY_INCREASED),
+        getOldElementLine(METHOD, getMethod(className, methodName, VOID, EMPTY_PARAMS)),
+        getNewElementLine(METHOD, getMethod(className, methodName, VOID, EMPTY_PARAMS)),
+        getOldVisibilityLine(oldVisibility),
+        getNewVisibilityLine(newVisibility),
+        API_ERROR_JUSTIFICATION,
+        getPackageLine(className),
+        getClassSimpleNameLine(className),
+        getMethodNameLine(methodName),
+        getElementKindLine(METHOD)};
+
+    return errorLog;
+  }
+
+  /**
+   * Generates error log for {@value METHOD_VISIBILITY_INCREASED} for constructors
+   *
+   * @param className     name of the class
+   * @param oldVisibility constructor visibility declared in the old version of the class
+   * @param newVisibility constructor visibility declared in the new version of the class
+   * @param oldParams     parameters declared in the old version of the class
+   * @param newParams     parameters declared in the new version of the class
+   * @return the expected error log lines for this error code
+   */
+  public static String[] getConstructorVisibilityIncreasedError(String className, String oldVisibility, String newVisibility,
+                                                                String oldParams, String newParams) {
+    String methodName = CONSTRUCTOR_METHOD;
+
+    return new String[] {
+        getErrorCodeLine(METHOD_VISIBILITY_INCREASED),
+        getOldElementLine(METHOD, getMethod(className, methodName, VOID, oldParams)),
+        getNewElementLine(METHOD, getMethod(className, methodName, VOID, newParams)),
+        getOldVisibilityLine(oldVisibility),
+        getNewVisibilityLine(newVisibility),
+        API_ERROR_JUSTIFICATION,
+        getPackageLine(className),
+        getClassSimpleNameLine(className),
+        getMethodNameLine(methodName),
+        getElementKindLine(METHOD)};
   }
 
   /**
@@ -334,13 +388,13 @@ public class ApiErrorLogUtils {
         getErrorCodeLine(METHOD_NOW_STATIC),
         getOldElementLine(METHOD, getMethod(className, methodName, VOID, EMPTY_PARAMS)),
         getNewElementLine(METHOD, getMethod(className, methodName, VOID, EMPTY_PARAMS)),
+        API_ERROR_JUSTIFICATION,
         getOldModifiersLine(oldModifiers),
         getNewModifiersLine(newModifiers),
         getPackageLine(className),
         getClassSimpleNameLine(className),
         getMethodNameLine(methodName),
-        getElementKindLine(METHOD),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(METHOD)
     };
 
     return errorLog;
@@ -360,13 +414,13 @@ public class ApiErrorLogUtils {
         getErrorCodeLine(METHOD_NO_LONGER_STATIC),
         getOldElementLine(METHOD, getMethod(className, methodName, VOID, EMPTY_PARAMS)),
         getNewElementLine(METHOD, getMethod(className, methodName, VOID, EMPTY_PARAMS)),
+        API_ERROR_JUSTIFICATION,
         getOldModifiersLine(oldModifiers),
         getNewModifiersLine(newModifiers),
         getPackageLine(className),
         getClassSimpleNameLine(className),
         getMethodNameLine(methodName),
-        getElementKindLine(METHOD),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(METHOD)
     };
     return errorLog;
   }
@@ -385,11 +439,11 @@ public class ApiErrorLogUtils {
         getErrorCodeLine(METHOD_NUMBER_OF_PARAMETERS_CHANGED),
         getOldElementLine(METHOD, getMethod(className, methodName, VOID, oldParams)),
         getNewElementLine(METHOD, getMethod(className, methodName, VOID, newParams)),
+        API_ERROR_JUSTIFICATION,
         getPackageLine(className),
         getClassSimpleNameLine(className),
         getMethodNameLine(methodName),
-        getElementKindLine(METHOD),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(METHOD)
     };
 
     return errorLog;
@@ -408,11 +462,11 @@ public class ApiErrorLogUtils {
         getErrorCodeLine(ApiErrorLogUtils.METHOD_NUMBER_OF_PARAMETERS_CHANGED),
         getOldElementLine(METHOD, getMethod(className, methodName, VOID, oldParams)),
         getNewElementLine(METHOD, getMethod(className, methodName, VOID, newParams)),
+        API_ERROR_JUSTIFICATION,
         getPackageLine(className),
         getClassSimpleNameLine(className),
         getMethodNameLine(methodName),
-        getElementKindLine(CONSTRUCTOR),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(CONSTRUCTOR)
     };
 
     return errorLog;
@@ -432,13 +486,13 @@ public class ApiErrorLogUtils {
         getErrorCodeLine(METHOD_NOW_FINAL),
         getOldElementLine(METHOD, getMethod(className, methodName, VOID, EMPTY_PARAMS)),
         getNewElementLine(METHOD, getMethod(className, methodName, VOID, EMPTY_PARAMS)),
+        API_ERROR_JUSTIFICATION,
         getOldModifiersLine(oldModifiers),
         getNewModifiersLine(newModifiers),
         getPackageLine(className),
         getClassSimpleNameLine(className),
         getMethodNameLine(methodName),
-        getElementKindLine(METHOD),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(METHOD)
     };
 
     return errorLog;
@@ -455,11 +509,11 @@ public class ApiErrorLogUtils {
     String[] errorLog = new String[] {
         getErrorCodeLine(METHOD_ADDED),
         getNewElementLine(METHOD, getMethod(className, methodName, VOID, EMPTY_PARAMS)),
+        API_ERROR_JUSTIFICATION,
         getPackageLine(className),
         getClassSimpleNameLine(className),
         getMethodNameLine(methodName),
-        getElementKindLine(METHOD),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(METHOD)
     };
 
     return errorLog;
@@ -476,11 +530,11 @@ public class ApiErrorLogUtils {
     String[] errorLog = new String[] {
         getErrorCodeLine(METHOD_REMOVED),
         getOldElementLine(METHOD, getMethod(className, methodName, VOID, EMPTY_PARAMS)),
+        API_ERROR_JUSTIFICATION,
         getPackageLine(className),
         getClassSimpleNameLine(className),
         getMethodNameLine(methodName),
-        getElementKindLine(METHOD),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(METHOD)
     };
 
     return errorLog;
@@ -498,11 +552,11 @@ public class ApiErrorLogUtils {
     String[] errorLog = new String[] {
         getErrorCodeLine(METHOD_REMOVED),
         getOldElementLine(METHOD, getMethod(className, methodName, VOID, params)),
+        API_ERROR_JUSTIFICATION,
         getPackageLine(className),
         getClassSimpleNameLine(className),
         getMethodNameLine(methodName),
-        getElementKindLine(CONSTRUCTOR),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(CONSTRUCTOR)
     };
 
     return errorLog;
@@ -522,13 +576,13 @@ public class ApiErrorLogUtils {
         getErrorCodeLine(METHOD_NOW_ABSTRACT),
         getOldElementLine(METHOD, getMethod(className, methodName, VOID, EMPTY_PARAMS)),
         getNewElementLine(METHOD, getMethod(className, methodName, VOID, EMPTY_PARAMS)),
+        API_ERROR_JUSTIFICATION,
         getOldModifiersLine(oldModifiers),
         getNewModifiersLine(newModifiers),
         getPackageLine(className),
         getClassSimpleNameLine(className),
         getMethodNameLine(methodName),
-        getElementKindLine(METHOD),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(METHOD)
     };
 
     return errorLog;
@@ -545,11 +599,11 @@ public class ApiErrorLogUtils {
     String[] errorLog = new String[] {
         getErrorCodeLine(METHOD_ADDED_TO_INTERFACE),
         getNewElementLine(METHOD, getMethod(className, methodName, VOID, EMPTY_PARAMS)),
+        API_ERROR_JUSTIFICATION,
         getPackageLine(className),
         getClassSimpleNameLine(className),
         getMethodNameLine(methodName),
-        getElementKindLine(METHOD),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(METHOD)
     };
 
     return errorLog;
@@ -571,11 +625,11 @@ public class ApiErrorLogUtils {
         getNewElementLine(FIELD, getFieldName(className, fieldName)),
         getOldVisibilityLine(oldVisibility),
         getNewVisibilityLine(newVisibility),
+        API_ERROR_JUSTIFICATION,
         getPackageLine(className),
         getClassSimpleNameLine(className),
         getFieldNameLine(fieldName),
-        getElementKindLine(FIELD),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(FIELD)
     };
 
     return errorLog;
@@ -595,13 +649,13 @@ public class ApiErrorLogUtils {
         getErrorCodeLine(FIELD_NOW_FINAL),
         getOldElementLine(FIELD, getFieldName(className, fieldName)),
         getNewElementLine(FIELD, getFieldName(className, fieldName)),
+        API_ERROR_JUSTIFICATION,
         getOldModifiersLine(oldModifiers),
         getNewModifiersLine(newModifiers),
         getPackageLine(className),
         getClassSimpleNameLine(className),
         getFieldNameLine(fieldName),
-        getElementKindLine(FIELD),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(FIELD)
     };
 
     return errorLog;
@@ -618,11 +672,11 @@ public class ApiErrorLogUtils {
     String[] errorLog = new String[] {
         getErrorCodeLine(FIELD_REMOVED),
         getOldElementLine(FIELD, getFieldName(className, fieldName)),
+        API_ERROR_JUSTIFICATION,
         getPackageLine(className),
         getClassSimpleNameLine(className),
         getFieldNameLine(fieldName),
-        getElementKindLine(FIELD),
-        API_ERROR_JUSTIFICATION
+        getElementKindLine(FIELD)
     };
 
     return errorLog;
@@ -654,66 +708,66 @@ public class ApiErrorLogUtils {
   }
 
   private static String getClassSimpleNameLine(String className) {
-    return "[ERROR]   \"classSimpleName\": \"" + getSimpleName(className) + "\",";
+    return "\"classSimpleName\": \"" + getSimpleName(className) + "\",";
   }
 
   private static String getPackageLine(String className) {
-    return "[ERROR]   \"package\": \"" + getPackageName(className) + "\",";
+    return "\"package\": \"" + getPackageName(className) + "\",";
   }
 
   private static String getErrorCodeLine(String errorCode) {
-    return format("[ERROR]   \"code\": \"%s\",", errorCode);
+    return format("\"code\": \"%s\",", errorCode);
   }
 
   private static String getOldModifiersLine(String oldModifiers) {
-    return format("[ERROR]   \"oldModifiers\": \"%s\",", oldModifiers);
+    return format("\"oldModifiers\": \"%s\",", oldModifiers);
   }
 
   private static String getNewModifiersLine(String newModifiers) {
-    return format("[ERROR]   \"newModifiers\": \"%s\",", newModifiers);
+    return format("\"newModifiers\": \"%s\",", newModifiers);
   }
 
   private static String getNewVisibilityLine(String newVisibility) {
-    return format("[ERROR]   \"newVisibility\": \"%s\",", newVisibility);
+    return format("\"newVisibility\": \"%s\",", newVisibility);
   }
 
   private static String getOldVisibilityLine(String oldVisibility) {
-    return format("[ERROR]   \"oldVisibility\": \"%s\",", oldVisibility);
+    return format("\"oldVisibility\": \"%s\",", oldVisibility);
   }
 
   private static String getSuperClassLine(String superClassName) {
-    return format("[ERROR]   \"superClass\": \"%s\",", superClassName);
+    return format("\"superClass\": \"%s\",", superClassName);
   }
 
   private static String getOldElementLine(String type, String element) {
-    return format("[ERROR]   \"old\": \"%s %s\",", type, element);
+    return format("\"old\": \"%s %s\",", type, element);
   }
 
   private static String getNewElementLine(String type, String element) {
-    return format("[ERROR]   \"new\": \"%s %s\",", type, element);
+    return format("\"new\": \"%s %s\",", type, element);
   }
 
   private static String getFieldNameLine(String fieldName) {
-    return format("[ERROR]   \"fieldName\": \"%s\",", fieldName);
+    return format("\"fieldName\": \"%s\",", fieldName);
   }
 
   private static String getMethodNameLine(String methodName) {
-    return format("[ERROR]   \"methodName\": \"%s\",", methodName);
+    return format("\"methodName\": \"%s\",", methodName);
   }
 
   private static String getOldTypeLine(String type) {
-    return format("[ERROR]   \"oldType\": \"%s\",", type);
+    return format("\"oldType\": \"%s\",", type);
   }
 
   private static String getNewTypeLine(String type) {
-    return format("[ERROR]   \"newType\": \"%s\",", type);
+    return format("\"newType\": \"%s\",", type);
   }
 
   private static String getElementKindLine(String elementKind) {
-    return format("[ERROR]   \"elementKind\": \"%s\",", elementKind);
+    return format("\"elementKind\": \"%s\",", elementKind);
   }
 
   private static String getParameterIndexLine(int index) {
-    return format("[ERROR]   \"parameterIndex\": \"%s\",", index);
+    return format("\"parameterIndex\": \"%s\",", index);
   }
 }

@@ -6,7 +6,7 @@
  */
 package org.foo;
 
-final class A
+public final class A
 {
 
 

@@ -25,6 +25,9 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,12 +43,15 @@ import org.junit.runner.RunWith;
 @RunWith(MavenJUnitTestRunner.class)
 public abstract class AbstractApiCheckTestCase {
 
-  private static final Pattern moduleTitleStart = Pattern.compile("\\[INFO\\]\\s-+<.*>-+");
-  private static final Pattern reactorSummaryStart = Pattern.compile("\\[INFO\\]\\s-+");
+  private static final Pattern moduleTitleStart = Pattern.compile("\\[INFO]\\s-+<.*>-+");
+  private static final Pattern reactorSummaryStart = Pattern.compile("\\[INFO]\\s-+");
+  private static final Pattern revapiCheckStart =
+      Pattern.compile("\\[INFO]\\sComparing\\s\\[.+]\\sagainst\\s\\[.+].*");
   private static final String MAVEN_BUILD_PREFIX = "[INFO] Building ";
   private static final String API_ERROR_FOUND = "The following API problems caused the build to fail:";
   private static final String REACTOR_SUMMARY = "Reactor Summary";
   private static final String MAVEN_BUILD_ERROR = "[INFO] BUILD FAILURE";
+  private static final String REVAPI_CHECK = "Revapi check";
 
   @Rule
   public final TestResources resources = new TestResources();
@@ -66,13 +72,14 @@ public abstract class AbstractApiCheckTestCase {
 
     Map<String, List<String>> moduleLogs = splitLog(logLines);
 
-    List<String> reactorSummaryLog = moduleLogs.get(REACTOR_SUMMARY);
-    assertThat(reactorSummaryLog, hasItem(containsString(API_ERROR_FOUND)));
+    assertThat(moduleLogs.get(REACTOR_SUMMARY), hasItem(containsString(API_ERROR_FOUND)));
+
+    List<String> revapiCheckLog = moduleLogs.get(REVAPI_CHECK);
     for (String[] apiError : brokenApiLog) {
-      assertMultiLogLine(reactorSummaryLog, apiError);
+      assertMultiLogLine(revapiCheckLog, apiError);
     }
 
-    int errorCount = reactorSummaryLog.stream().filter(s -> s.equals(API_ERROR_JUSTIFICATION)).collect(toList()).size();
+    int errorCount = (int) revapiCheckLog.stream().filter(s -> s.contains(API_ERROR_JUSTIFICATION)).count();
     assertThat(errorCount, equalTo(brokenApiLog.length));
   }
 
@@ -84,7 +91,9 @@ public abstract class AbstractApiCheckTestCase {
     Map<String, List<String>> moduleLogs = splitLog(logLines);
 
     List<String> reactorSummaryLog = moduleLogs.get(REACTOR_SUMMARY);
-    assertThat(reactorSummaryLog, not(hasItem(containsString(API_ERROR_FOUND))));
+    List<String> revapiCheckLog = moduleLogs.get(REVAPI_CHECK);
+    // if there was an unexpected error, it will be in the revapi output
+    assertThat(revapiCheckLog.toString(), reactorSummaryLog, not(hasItem(containsString(API_ERROR_FOUND))));
     assertThat(reactorSummaryLog, not(hasItem(containsString(MAVEN_BUILD_ERROR))));
   }
 
@@ -104,28 +113,38 @@ public abstract class AbstractApiCheckTestCase {
     int i = 0;
     while (i < logLines.size()) {
       String currentLine = logLines.get(i);
-      if (moduleTitleStart.matcher(currentLine).find() || reactorSummaryStart.matcher(currentLine).find()) {
+      if (moduleTitleStart.matcher(currentLine).find() || revapiCheckStart.matcher(currentLine).find()
+          || reactorSummaryStart.matcher(currentLine).find()) {
         if (i + 1 < logLines.size() && logLines.get(i + 1).startsWith(MAVEN_BUILD_PREFIX)) {
           int moduleLogStart = i;
           String moduleName = logLines.get(i + 1).substring(MAVEN_BUILD_PREFIX.length());
           i = i + 3;
 
           while (i < logLines.size() && !(moduleTitleStart.matcher(logLines.get(i)).find())
-              && !(reactorSummaryStart.matcher(logLines.get(i)).find())) {
+              && !(revapiCheckStart.matcher(logLines.get(i)).find()) && !(reactorSummaryStart.matcher(logLines.get(i)).find())) {
             i++;
           }
 
           result.put(moduleName, logLines.subList(moduleLogStart, i));
+        } else if (i + 1 < logLines.size() && revapiCheckStart.matcher(currentLine).find()) {
+          int moduleLogStart = i;
+          i = i + 1;
+
+          while (i < logLines.size() && !(moduleTitleStart.matcher(logLines.get(i)).find())
+              && !(reactorSummaryStart.matcher(logLines.get(i)).find())) {
+            i++;
+          }
+
+          result.put(REVAPI_CHECK, logLines.subList(moduleLogStart, i));
         } else if (i + 1 < logLines.size() && logLines.get(i + 1).startsWith("[INFO] Reactor Summary:")) {
           int moduleLogStart = i;
-          String moduleName = REACTOR_SUMMARY;
           i = i + 3;
 
           while (i < logLines.size()) {
             i++;
           }
 
-          result.put(moduleName, logLines.subList(moduleLogStart, i));
+          result.put(REACTOR_SUMMARY, logLines.subList(moduleLogStart, i));
         } else {
           i++;
         }
@@ -141,16 +160,23 @@ public abstract class AbstractApiCheckTestCase {
       throw new IllegalArgumentException("There must be more than one line to assert. Use MavenExecutionResult#assertLogText instead");
     }
 
+    Collection<String> linesCollection = new ArrayList<>();
+    Collections.addAll(linesCollection, lines);
+
+    int linesMatched = 0;
+
     for (int i = 0; i < log.size(); i++) {
-      if (i + lines.length > log.size()) {
+      if (i + lines.length - linesMatched > log.size()) {
         break;
       }
-      int j = 0;
-      while (j < lines.length && log.get(i + j).equals(lines[j])) {
-        j++;
+
+      final String currentLine = log.get(i);
+
+      if (linesCollection.stream().anyMatch(currentLine::endsWith)) {
+        linesMatched++;
       }
 
-      if (j == lines.length) {
+      if (linesMatched == lines.length) {
         return;
       }
     }

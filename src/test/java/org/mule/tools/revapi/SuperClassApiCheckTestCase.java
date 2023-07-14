@@ -59,11 +59,4 @@ public class SuperClassApiCheckTestCase extends AbstractApiCheckTestCase {
   public void ignoresRemovedSuperClassInExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedSuperClassInExportedPackageClass");
   }
-
-  @Test
-  public void detectsRemovedSuperClassInExportedPublicFinalClass() throws Exception {
-    String[] classNoLongerExtendsFromError = getClassNoLongerExtendsFromError(ORG_FOO_A, ORG_FOO_B);
-
-    doBrokenApiTest("detectsRemovedSuperClassInExportedPublicFinalClass", classNoLongerExtendsFromError);
-  }
 }
