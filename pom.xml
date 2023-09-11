@@ -88,9 +88,9 @@
         <skipVerifications>false</skipVerifications>
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
        
-        <mulesoftLicenseVersion>1.1.0</mulesoftLicenseVersion>
+        <mulesoftLicenseVersion>1.4.0</mulesoftLicenseVersion>
         <license.maven.plugin.version>4.2</license.maven.plugin.version>
-        <licensePath>LICENSE_HEADER_80.txt</licensePath>
+        <licensePath>LICENSE_HEADER_CPAL.txt</licensePath>
         <licenseYear>2023</licenseYear>
 
         <takari.lifecycle.plugin.version>1.13.10</takari.lifecycle.plugin.version>
