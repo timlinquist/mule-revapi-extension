@@ -80,7 +80,7 @@
         <revapi-basic-features.version>0.13.0</revapi-basic-features.version>
         <revapi-java.version>0.28.1</revapi-java.version>
         <revapi-java-spi.version>0.25.0</revapi-java-spi.version>
-        <takari.test.version>3.0.0</takari.test.version>
+        <takari.test.version>3.0.2</takari.test.version>
         <junit.version>4.13.2</junit.version>
         <hamcrest-core.version>2.2</hamcrest-core.version>
         <jdk.version>1.8</jdk.version>
