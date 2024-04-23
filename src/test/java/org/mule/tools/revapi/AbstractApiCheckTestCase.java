@@ -6,19 +6,20 @@
  */
 package org.mule.tools.revapi;
 
+import static org.mule.tools.revapi.ApiErrorLogUtils.API_ERROR_JUSTIFICATION;
+
 import static java.io.File.separator;
 import static java.lang.System.getProperty;
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.toList;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.junit.Assert.assertThat;
-import static org.mule.tools.revapi.ApiErrorLogUtils.API_ERROR_JUSTIFICATION;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsIterableContaining.hasItem;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -36,6 +37,7 @@ import io.takari.maven.testing.TestResources;
 import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
 import io.takari.maven.testing.executor.junit.MavenJUnitTestRunner;
+
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 
@@ -59,8 +61,15 @@ public abstract class AbstractApiCheckTestCase {
   private final String folder;
 
   public AbstractApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, String folder) throws Exception {
-    this.mavenRuntime =
-        builder.withCliOptions("--batch-mode", "-Dmaven.repo.local=" + getProperty("maven.repo.local", "")).build();
+    this(builder, folder, "1.8");
+  }
+
+  public AbstractApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, String folder, String sourceLevel) throws Exception {
+    this.mavenRuntime = builder.withCliOptions("--batch-mode",
+                                               "-Dmaven.repo.local=" + getProperty("maven.repo.local", ""),
+                                               "-Dmaven.compiler.source=" + sourceLevel,
+                                               "-Dmaven.compiler.target=" + sourceLevel)
+        .build();
     this.folder = folder;
   }
 
