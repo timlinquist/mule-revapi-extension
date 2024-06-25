@@ -97,7 +97,7 @@
         <licensePath>LICENSE_HEADER_CPAL.txt</licensePath>
         <licenseYear>2023</licenseYear>
 
-        <json.schema.validator.version>1.4.0</json.schema.validator.version>
+        <json.schema.validator.version>1.4.2</json.schema.validator.version>
         <takari.lifecycle.plugin.version>1.13.10</takari.lifecycle.plugin.version>
     </properties>
 
