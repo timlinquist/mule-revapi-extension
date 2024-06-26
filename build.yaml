@@ -1,5 +1,5 @@
 upstreamProjects:
-  Mule-runtime/api-annotations/master
+  Mule-runtime/api-annotations/master-JULY-2024
 mavenSettingsXmlId: mule-runtime-maven-settings-MuleSettings
 projectType: runtime
 jdkTool: OPEN-JDK17
