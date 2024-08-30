@@ -81,12 +81,6 @@
         <muleBomVersion>4.9.0-SNAPSHOT</muleBomVersion>
 
         <revapi.skip>false</revapi.skip>
-        <revapi-basic-features.version>0.13.0</revapi-basic-features.version>
-        <revapi-java.version>0.28.1</revapi-java.version>
-        <revapi-java-spi.version>0.25.0</revapi-java-spi.version>
-        <takari.test.version>3.0.2</takari.test.version>
-        <junit.version>4.13.2</junit.version>
-        <hamcrest-core.version>2.2</hamcrest-core.version>
 
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -96,9 +90,6 @@
        
         <licensePath>LICENSE_HEADER_CPAL.txt</licensePath>
         <licenseYear>2023</licenseYear>
-
-        <json.schema.validator.version>1.4.3</json.schema.validator.version>
-        <takari.lifecycle.plugin.version>1.13.10</takari.lifecycle.plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -111,9 +102,11 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>com.networknt</groupId>
-                <artifactId>json-schema-validator</artifactId>
-                <version>${json.schema.validator.version}</version> 
+                <groupId>org.mule</groupId>
+                <artifactId>mule-tests-bom</artifactId>
+                <version>${muleBomVersion}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -128,36 +121,30 @@
         <dependency>
             <groupId>org.revapi</groupId>
             <artifactId>revapi-basic-features</artifactId>
-            <version>${revapi-basic-features.version}</version>
         </dependency>
         <dependency>
             <groupId>org.revapi</groupId>
             <artifactId>revapi-java</artifactId>
-            <version>${revapi-java.version}</version>
         </dependency>
         <dependency>
             <groupId>org.revapi</groupId>
             <artifactId>revapi-java-spi</artifactId>
-            <version>${revapi-java-spi.version}</version>
         </dependency>
 
         <!-- test -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-            <version>${hamcrest-core.version}</version>
+            <artifactId>hamcrest</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.takari.maven.plugins</groupId>
             <artifactId>takari-plugin-integration-testing</artifactId>
-            <version>${takari.test.version}</version>
             <type>pom</type>
             <scope>test</scope>
         </dependency>
@@ -180,7 +167,6 @@
             <plugin>
                 <groupId>io.takari.maven.plugins</groupId>
                 <artifactId>takari-lifecycle-plugin</artifactId>
-                <version>${takari.lifecycle.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>testProperties</id>
