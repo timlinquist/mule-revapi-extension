@@ -11,68 +11,70 @@ import static org.mule.tools.revapi.ApiErrorLogUtils.ORG_FOO_A;
 import static org.mule.tools.revapi.ApiErrorLogUtils.getFieldTypeChangedError;
 
 import io.takari.maven.testing.executor.MavenRuntime;
-import org.junit.Test;
+import io.takari.maven.testing.executor.junit.MavenPluginTest;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(AbstractApiCheckTestCase.ApiCheckTestCaseContextProvider.class)
 public class FieldTypeApiCheckTestCase extends AbstractApiCheckTestCase {
 
-  public FieldTypeApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
-    super(builder, "fieldType");
+  public FieldTypeApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, boolean isPromotedApi) throws Exception {
+    super(builder, "fieldType", isPromotedApi);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsTypeChangeInExportedPublicInstanceField() throws Exception {
     String[] typeChangedError = getFieldTypeChangedError(ORG_FOO_A, B_FIELD);
 
     doBrokenApiTest("detectsTypeChangeInExportedPublicInstanceField", typeChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresTypeChangeInInternalPublicInstanceField() throws Exception {
     doUnmodifiedApiTest("ignoresTypeChangeInInternalPublicInstanceField");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsTypeChangeInExportedProtectedInstanceField() throws Exception {
     String[] typeChangedError = getFieldTypeChangedError(ORG_FOO_A, B_FIELD);
 
     doBrokenApiTest("detectsTypeChangeInExportedProtectedInstanceField", typeChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresTypeChangeInInternalProtectedInstanceField() throws Exception {
     doUnmodifiedApiTest("ignoresTypeChangeInInternalProtectedInstanceField");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresTypeChangeInExportedPackageInstanceField() throws Exception {
     doUnmodifiedApiTest("ignoresTypeChangeInExportedPackageInstanceField");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresTypeChangeInExportedPrivateInstanceField() throws Exception {
     doUnmodifiedApiTest("ignoresTypeChangeInExportedPrivateInstanceField");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresTypeChangeInExportedProtectedInstanceFieldFromNoExtendClass() throws Exception {
     doUnmodifiedApiTest("ignoresTypeChangeInExportedProtectedInstanceFieldFromNoExtendClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsTypeChangeInExportedPublicInstanceFieldFromNoExtendClass() throws Exception {
     String[] typeChangedError = getFieldTypeChangedError(ORG_FOO_A, B_FIELD);
 
     doBrokenApiTest("detectsTypeChangeInExportedPublicInstanceFieldFromNoExtendClass", typeChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsTypeChangeInExportedPublicInstanceFieldFromNoInstantiateClass() throws Exception {
     String[] typeChangedError = getFieldTypeChangedError(ORG_FOO_A, B_FIELD);
 
     doBrokenApiTest("detectsTypeChangeInExportedPublicInstanceFieldFromNoInstantiateClass", typeChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresTypeChangeInExportedProtectedInstanceFieldFromNoInstantiateClass() throws Exception {
     doUnmodifiedApiTest("ignoresTypeChangeInExportedProtectedInstanceFieldFromNoInstantiateClass");
   }

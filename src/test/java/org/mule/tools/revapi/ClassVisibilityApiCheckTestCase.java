@@ -13,20 +13,21 @@ import static org.mule.tools.revapi.ApiErrorLogUtils.PRIVATE;
 import static org.mule.tools.revapi.ApiErrorLogUtils.PROTECTED;
 import static org.mule.tools.revapi.ApiErrorLogUtils.PUBLIC;
 import static org.mule.tools.revapi.ApiErrorLogUtils.getClassVisibilityReducedError;
-import static org.mule.tools.revapi.ApiErrorLogUtils.getRemovedClassErrorLog;
 
 import io.takari.maven.testing.executor.MavenRuntime;
-import org.junit.Ignore;
-import org.junit.Test;
+import io.takari.maven.testing.executor.junit.MavenPluginTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(AbstractApiCheckTestCase.ApiCheckTestCaseContextProvider.class)
 public class ClassVisibilityApiCheckTestCase extends AbstractApiCheckTestCase {
 
-  public ClassVisibilityApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
-    super(builder, "classVisibility");
+  public ClassVisibilityApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, boolean isPromotedApi) throws Exception {
+    super(builder, "classVisibility", isPromotedApi);
   }
 
-  @Test
-  @Ignore("Revapi incorrectly reports this case as if the class was removed instead of its visibility reduced. " +
+  @MavenPluginTest
+  @Disabled("Revapi incorrectly reports this case as if the class was removed instead of its visibility reduced. " +
       "The following issue has been reported in the revapi project: https://github.com/revapi/revapi/issues/288")
   public void detectsPublicToPackageExportedClass() throws Exception {
     // Note: this kind of change was detected as a visibility reduction, but is now considered by revapi to be a removal of the
@@ -35,67 +36,67 @@ public class ClassVisibilityApiCheckTestCase extends AbstractApiCheckTestCase {
     doBrokenApiTest("detectsPublicToPackageExportedClass", classVisibilityReducedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresPublicToPackageInternalClass() throws Exception {
     doUnmodifiedApiTest("ignoresPublicToPackageInternalClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsPublicToProtectedExportedInnerClass() throws Exception {
     String[] classVisibilityReducedError = getClassVisibilityReducedError(ORG_FOO_A_B, PUBLIC, PROTECTED);
     doBrokenApiTest("detectsPublicToProtectedExportedInnerClass", classVisibilityReducedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresPublicToProtectedInternalInnerClass() throws Exception {
     doUnmodifiedApiTest("ignoresPublicToProtectedInternalInnerClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsPublicToPackageExportedInnerClass() throws Exception {
     String[] classVisibilityReducedError = getClassVisibilityReducedError(ORG_FOO_A_B, PUBLIC, PACKAGE);
     doBrokenApiTest("detectsPublicToPackageExportedInnerClass", classVisibilityReducedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresPublicToPackageInternalInnerClass() throws Exception {
     doUnmodifiedApiTest("ignoresPublicToPackageInternalInnerClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsPublicToPrivateExportedInnerClass() throws Exception {
     String[] classVisibilityReducedError = getClassVisibilityReducedError(ORG_FOO_A_B, PUBLIC, PRIVATE);
     doBrokenApiTest("detectsPublicToPrivateExportedInnerClass", classVisibilityReducedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresPublicToPrivateInternalInnerClass() throws Exception {
     doUnmodifiedApiTest("ignoresPublicToPrivateInternalInnerClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsProtectedToPackageExportedInnerClass() throws Exception {
     String[] classVisibilityReducedError = getClassVisibilityReducedError(ORG_FOO_A_B, PROTECTED, PACKAGE);
     doBrokenApiTest("detectsProtectedToPackageExportedInnerClass", classVisibilityReducedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresProtectedToPackageInternalInnerClass() throws Exception {
     doUnmodifiedApiTest("ignoresProtectedToPackageInternalInnerClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsProtectedToPrivateExportedInnerClass() throws Exception {
     String[] classVisibilityReducedError = getClassVisibilityReducedError(ORG_FOO_A_B, PROTECTED, PRIVATE);
     doBrokenApiTest("detectsProtectedToPrivateExportedInnerClass", classVisibilityReducedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresProtectedToPrivateInternalInnerClass() throws Exception {
     doUnmodifiedApiTest("ignoresProtectedToPrivateInternalInnerClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresPackageToPrivateExportedInnerClass() throws Exception {
     doUnmodifiedApiTest("ignoresPackageToPrivateExportedInnerClass");
   }

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.foo</groupId>
+        <artifactId>foo-parent</artifactId>
+        <version>1.0.0</version>
+        <relativePath>../../../parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>baz-test-project</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+    <name>Aggregates old and new API projects</name>
+
+    <modules>
+        <module>old</module>
+        <module>new</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.revapi</groupId>
+                <artifactId>revapi-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>api-check</id>
+                        <goals><goal>check</goal></goals>
+                        <configuration>
+                            <!-- This will be removed after the configuration is automatically generated -->
+                            <promotedDependencies>
+                                <dependency>
+                                    <artifactId>empty-project</artifactId>
+                                </dependency>
+                            </promotedDependencies>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+

@@ -12,49 +12,51 @@ import static org.mule.tools.revapi.ApiErrorLogUtils.getClassNoLongerExtendsFrom
 import static org.mule.tools.revapi.ApiErrorLogUtils.getNonFinalClassInheritsFromNewClassError;
 
 import io.takari.maven.testing.executor.MavenRuntime;
-import org.junit.Test;
+import io.takari.maven.testing.executor.junit.MavenPluginTest;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(AbstractApiCheckTestCase.ApiCheckTestCaseContextProvider.class)
 public class SuperClassApiCheckTestCase extends AbstractApiCheckTestCase {
 
-  public SuperClassApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
-    super(builder, "superclass");
+  public SuperClassApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, boolean isPromotedApi) throws Exception {
+    super(builder, "superclass", isPromotedApi);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsAddedSuperClassInExportedPublicClass() throws Exception {
     String[] nonFinalClassInheritsFromNewClassError = getNonFinalClassInheritsFromNewClassError(ORG_FOO_A, ORG_FOO_B);
 
     doBrokenApiTest("detectsAddedSuperClassInExportedPublicClass", nonFinalClassInheritsFromNewClassError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedSuperClassInInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedSuperClassInInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedSuperClassInExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedSuperClassInExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedSuperClassInExportedPublicFinalClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedSuperClassInExportedPublicFinalClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsRemovedSuperClassInExportedPublicClass() throws Exception {
     String[] classNoLongerExtendsFromError = getClassNoLongerExtendsFromError(ORG_FOO_A, ORG_FOO_B);
 
     doBrokenApiTest("detectsRemovedSuperClassInExportedPublicClass", classNoLongerExtendsFromError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedSuperClassInInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedSuperClassInInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedSuperClassInExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedSuperClassInExportedPackageClass");
   }

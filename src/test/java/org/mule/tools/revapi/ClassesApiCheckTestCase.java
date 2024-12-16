@@ -20,15 +20,17 @@ import static org.mule.tools.revapi.ApiErrorLogUtils.getConstructorVisibilityInc
 import static org.mule.tools.revapi.ApiErrorLogUtils.getRemovedClassErrorLog;
 
 import io.takari.maven.testing.executor.MavenRuntime;
-import org.junit.Test;
+import io.takari.maven.testing.executor.junit.MavenPluginTest;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(AbstractApiCheckTestCase.ApiCheckTestCaseContextProvider.class)
 public class ClassesApiCheckTestCase extends AbstractApiCheckTestCase {
 
-  public ClassesApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
-    super(builder, "class");
+  public ClassesApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, boolean isPromotedApi) throws Exception {
+    super(builder, "class", isPromotedApi);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsApiChangesInExportedSuperClassInPublicClass() throws Exception {
     String[] aConstructorNumberOfParametersChangedError =
         getConstructorNumberOfParametersChangedError(ORG_FOO_A, EMPTY_PARAMS, STRING);
@@ -39,7 +41,7 @@ public class ClassesApiCheckTestCase extends AbstractApiCheckTestCase {
                     bConstructorNumberOfParametersChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsApiChangesInExportedSuperClassInProtectedInnerClass() throws Exception {
     String[] bConstructorNumberOfParametersChangedError =
         getConstructorNumberOfParametersChangedError(ORG_BAR_B, EMPTY_PARAMS, STRING);
@@ -51,45 +53,45 @@ public class ClassesApiCheckTestCase extends AbstractApiCheckTestCase {
                     cConstructorNumberOfParametersChangedError, cConstructorVisibilityIncreasedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresChangesInSuperClassInPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresChangesInSuperClassInPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresChangesInSuperClassInPrivateInnerClass() throws Exception {
     doUnmodifiedApiTest("ignoresChangesInSuperClassInPrivateInnerClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsAddedExportedPublicClass() throws Exception {
     String[] addedClassErrorLog = getAddedClassErrorLog();
     doBrokenApiTest("detectsAddedExportedPublicClass", addedClassErrorLog);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsRemovedExportedPublicClass() throws Exception {
     String[] removedClassErrorLog = getRemovedClassErrorLog(ORG_FOO_B);
 
     doBrokenApiTest("detectsRemovedExportedPublicClass", removedClassErrorLog);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedExportedPackageClass");
   }

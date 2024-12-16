@@ -13,49 +13,51 @@ import static org.mule.tools.revapi.ApiErrorLogUtils.PUBLIC_FINAL;
 import static org.mule.tools.revapi.ApiErrorLogUtils.getFieldNowFinalError;
 
 import io.takari.maven.testing.executor.MavenRuntime;
-import org.junit.Ignore;
-import org.junit.Test;
+import io.takari.maven.testing.executor.junit.MavenPluginTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(AbstractApiCheckTestCase.ApiCheckTestCaseContextProvider.class)
 public class FieldFinalModifierApiCheckTestCase extends AbstractApiCheckTestCase {
 
-  public FieldFinalModifierApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
-    super(builder, "fieldFinalModifier");
+  public FieldFinalModifierApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, boolean isPromotedApi) throws Exception {
+    super(builder, "fieldFinalModifier", isPromotedApi);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsAddedFinalModifierInExportedPublicField() throws Exception {
     String[] fieldNowFinalError = getFieldNowFinalError(PUBLIC, PUBLIC_FINAL);
     doBrokenApiTest("detectsAddedFinalModifierInExportedPublicField", fieldNowFinalError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedFinalModifierInInternalPublicField() throws Exception {
     doUnmodifiedApiTest("ignoresAddedFinalModifierInInternalPublicField");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsAddedFinalModifierInExportedProtectedField() throws Exception {
     String[] fieldNowFinalError = getFieldNowFinalError(PROTECTED, PROTECTED_FINAL);
     doBrokenApiTest("detectsAddedFinalModifierInExportedProtectedField", fieldNowFinalError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedFinalModifierInInternalProtectedField() throws Exception {
     doUnmodifiedApiTest("ignoresAddedFinalModifierInInternalProtectedField");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedFinalModifierInExportedPackageField() throws Exception {
     doUnmodifiedApiTest("ignoresAddedFinalModifierInExportedPackageField");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedFinalModifierInExportedPrivateField() throws Exception {
     doUnmodifiedApiTest("ignoresAddedFinalModifierInExportedPrivateField");
   }
 
-  @Test
-  @Ignore("Revapi considers this a API change, but the class is final, so no subclasses will access this protected field")
+  @MavenPluginTest
+  @Disabled("Revapi considers this a API change, but the class is final, so no subclasses will access this protected field")
   public void ignoresAddedFinalModifierInExportedProtectedFieldOnFinalClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedFinalModifierInExportedProtectedFieldOnFinalClass");
   }

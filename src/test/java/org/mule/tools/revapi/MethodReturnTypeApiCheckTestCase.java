@@ -11,88 +11,90 @@ import static org.mule.tools.revapi.ApiErrorLogUtils.ORG_FOO_A;
 import static org.mule.tools.revapi.ApiErrorLogUtils.getReturnTypeChangedError;
 
 import io.takari.maven.testing.executor.MavenRuntime;
-import org.junit.Test;
+import io.takari.maven.testing.executor.junit.MavenPluginTest;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(AbstractApiCheckTestCase.ApiCheckTestCaseContextProvider.class)
 public class MethodReturnTypeApiCheckTestCase extends AbstractApiCheckTestCase {
 
-  public MethodReturnTypeApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
+  public MethodReturnTypeApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, boolean isPromotedApi) throws Exception {
     super(builder, "methodReturnType");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsChangedReturnTypeInPublicMethodOnExportedPublicClass() throws Exception {
     String[] returnTypeChangedError = getReturnTypeChangedError(ORG_FOO_A, DO_STUFF_METHOD);
 
     doBrokenApiTest("detectsChangedReturnTypeInPublicMethodOnExportedPublicClass", returnTypeChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresChangedReturnTypeInPublicMethodOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresChangedReturnTypeInPublicMethodOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsChangedReturnTypeInProtectedMethodOnExportedPublicClass() throws Exception {
     String[] returnTypeChangedError = getReturnTypeChangedError(ORG_FOO_A, DO_STUFF_METHOD);
 
     doBrokenApiTest("detectsChangedReturnTypeInProtectedMethodOnExportedPublicClass", returnTypeChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresChangedReturnTypeInProtectedMethodOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresChangedReturnTypeInProtectedMethodOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresChangedReturnTypeInPackageMethodOnExportedPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresChangedReturnTypeInPackageMethodOnExportedPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresChangedReturnTypeInPrivateMethodOnExportedPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresChangedReturnTypeInPrivateMethodOnExportedPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresChangedReturnTypeInPublicMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresChangedReturnTypeInPublicMethodOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresChangedReturnTypeInProtectedMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresChangedReturnTypeInProtectedMethodOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresChangedReturnTypeInPackageMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresChangedReturnTypeInPackageMethodOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresChangedReturnTypeInPrivateMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresChangedReturnTypeInPrivateMethodOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresChangedReturnTypeInProtectedMethodOnExportedPublicNoExtendClass() throws Exception {
     doUnmodifiedApiTest("ignoresChangedReturnTypeInProtectedMethodOnExportedPublicNoExtendClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsChangedReturnTypeInPublicMethodOnExportedPublicNoExtendClass() throws Exception {
     String[] returnTypeChangedError = getReturnTypeChangedError(ORG_FOO_A, DO_STUFF_METHOD);
 
     doBrokenApiTest("detectsChangedReturnTypeInPublicMethodOnExportedPublicNoExtendClass", returnTypeChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsChangedReturnTypeInPublicMethodOnExportedPublicNoInstantiateClass() throws Exception {
     String[] returnTypeChangedError = getReturnTypeChangedError(ORG_FOO_A, DO_STUFF_METHOD);
 
     doBrokenApiTest("detectsChangedReturnTypeInPublicMethodOnExportedPublicNoInstantiateClass", returnTypeChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresChangedReturnTypeInProtectedMethodOnExportedPublicNoInstantiateClass() throws Exception {
     doUnmodifiedApiTest("ignoresChangedReturnTypeInProtectedMethodOnExportedPublicNoInstantiateClass");
   }

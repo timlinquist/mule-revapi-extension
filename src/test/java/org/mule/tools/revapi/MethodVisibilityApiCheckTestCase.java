@@ -14,108 +14,110 @@ import static org.mule.tools.revapi.ApiErrorLogUtils.getMethodVisibilityIncrease
 import static org.mule.tools.revapi.ApiErrorLogUtils.getMethodVisibilityReducedError;
 
 import io.takari.maven.testing.executor.MavenRuntime;
-import org.junit.Test;
+import io.takari.maven.testing.executor.junit.MavenPluginTest;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(AbstractApiCheckTestCase.ApiCheckTestCaseContextProvider.class)
 public class MethodVisibilityApiCheckTestCase extends AbstractApiCheckTestCase {
 
-  public MethodVisibilityApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
-    super(builder, "methodVisibility");
+  public MethodVisibilityApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, boolean isPromotedApi) throws Exception {
+    super(builder, "methodVisibility", isPromotedApi);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsProtectedToPublicMethodOnExportedPublicClass() throws Exception {
     String[] methodVisibilityIncreasedError = getMethodVisibilityIncreasedError(PROTECTED, PUBLIC);
     doBrokenApiTest("detectsProtectedToPublicMethodOnExportedPublicClass", methodVisibilityIncreasedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsPackageToPublicMethodOnExportedPublicClass() throws Exception {
     String[] methodVisibilityIncreasedError = getMethodVisibilityIncreasedError(PACKAGE, PUBLIC);
     doBrokenApiTest("detectsPackageToPublicMethodOnExportedPublicClass", methodVisibilityIncreasedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsPackageToProtectedMethodOnExportedPublicClass() throws Exception {
     String[] methodVisibilityIncreasedError = getMethodVisibilityIncreasedError(PACKAGE, PROTECTED);
     doBrokenApiTest("detectsPackageToProtectedMethodOnExportedPublicClass", methodVisibilityIncreasedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsPrivateToPublicMethodOnExportedPublicClass() throws Exception {
     String[] methodVisibilityIncreasedError = getMethodVisibilityIncreasedError(PRIVATE, PUBLIC);
     doBrokenApiTest("detectsPrivateToPublicMethodOnExportedPublicClass", methodVisibilityIncreasedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsPrivateToProtectedMethodOnExportedPublicClass() throws Exception {
     String[] methodVisibilityIncreasedError = getMethodVisibilityIncreasedError(PRIVATE, PROTECTED);
     doBrokenApiTest("detectsPrivateToProtectedMethodOnExportedPublicClass", methodVisibilityIncreasedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresPrivateToPackageMethodOnExportedPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresPrivateToPackageMethodOnExportedPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsPublicToProtectedMethodOnExportedPublicClass() throws Exception {
     String[] methodVisibilityReducedError = getMethodVisibilityReducedError(PUBLIC, PROTECTED);
     doBrokenApiTest("detectsPublicToProtectedMethodOnExportedPublicClass", methodVisibilityReducedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresPublicToProtectedMethodOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresPublicToProtectedMethodOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsPublicToPackageMethodOnExportedPublicClass() throws Exception {
     String[] methodVisibilityReducedError = getMethodVisibilityReducedError(PUBLIC, PACKAGE);
     doBrokenApiTest("detectsPublicToPackageMethodOnExportedPublicClass", methodVisibilityReducedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresPublicToPackageMethodOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresPublicToPackageMethodOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsPublicToPrivateMethodOnExportedPublicClass() throws Exception {
     String[] methodVisibilityReducedError = getMethodVisibilityReducedError(PUBLIC, PRIVATE);
 
     doBrokenApiTest("detectsPublicToPrivateMethodOnExportedPublicClass", methodVisibilityReducedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresPublicToPrivateMethodOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresPublicToPrivateMethodOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsProtectedToPackageMethodOnExportedPublicClass() throws Exception {
     String[] methodVisibilityReducedError = getMethodVisibilityReducedError(PROTECTED, PACKAGE);
 
     doBrokenApiTest("detectsProtectedToPackageMethodOnExportedPublicClass", methodVisibilityReducedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresProtectedToPackageMethodOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresProtectedToPackageMethodOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsProtectedToPrivateMethodOnExportedPublicClass() throws Exception {
     String[] methodVisibilityReducedError = getMethodVisibilityReducedError(PROTECTED, PRIVATE);
 
     doBrokenApiTest("detectsProtectedToPrivateMethodOnExportedPublicClass", methodVisibilityReducedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresProtectedToPrivateMethodOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresProtectedToPrivateMethodOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresPackageToPrivateMethodOnExportedPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresPackageToPrivateMethodOnExportedPublicClass");
   }

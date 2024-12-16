@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.foo</groupId>
+        <artifactId>baz-test-project</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>baz-empty-project</artifactId>
+    <version>1.0.1</version>
+    <packaging>jar</packaging>
+    <name>Baz Module</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.foo</groupId>
+            <artifactId>empty-project</artifactId>
+            <!-- Some tests will use 1.0.1, others 1.0.1-SNAPSHOT, so this is provided by each test -->
+            <version>${newDependencyVersion}</version>
+        </dependency>
+    </dependencies>
+
+</project>
+
