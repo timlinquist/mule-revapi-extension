@@ -19,7 +19,7 @@
                     <dependency>
                         <groupId>org.mule.tools.maven</groupId>
                         <artifactId>mule-revapi-extension</artifactId>
-                        <version>${it-plugin.version}</version>
+                        <version>1.9.0-SNAPSHOT</version>
                     </dependency>
                 </dependencies>
                 <configuration>
@@ -34,20 +34,24 @@
                                                 "behavior" : "report"
                                             }
                                         },
-                                        "semver": {
-                                          "ignore": {
-                                            "enabled": true,
-                                            "versionIncreaseAllows" : {
-                                              "major" : "breaking",
-                                              "minor" : "nonBreaking",
-                                              "patch" : "equivalent"
+                                        "versions": {
+                                        "enabled": true,
+                                        "versionIncreaseAllows": {
+                                            "major": {
+                                                "severity": "BREAKING"
                                             },
-                                            "passThroughDifferences": ["java.class.nonPublicPartOfAPI"]
-                                          }
+                                            "minor": {
+                                                "severity": "NON_BREAKING"
+                                            },
+                                            "patch": {
+                                                "severity": "EQUIVALENT"
+                                            }
+                                        },
+                                        "passThroughDifference": ["java.class.nonPublicPartOfAPI"]
                                         }
                                     }
                                 }
-                            ]]></analysisConfiguration>
+                    ]]></analysisConfiguration>
                 </configuration>
                 <executions>
                     <execution>

@@ -9,46 +9,49 @@ package org.mule.tools.revapi;
 import static org.mule.tools.revapi.ApiErrorLogUtils.getConstructorRemovedError;
 
 import io.takari.maven.testing.executor.MavenRuntime;
-import org.junit.Test;
+import io.takari.maven.testing.executor.junit.MavenPluginTest;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+
+@ExtendWith(AbstractApiCheckTestCase.ApiCheckTestCaseContextProvider.class)
 public class ClassConstructorApiCheckTestCase extends AbstractApiCheckTestCase {
 
-  public ClassConstructorApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
-    super(builder, "classConstructor");
+  public ClassConstructorApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, boolean isPromotedApi) throws Exception {
+    super(builder, "classConstructor", isPromotedApi);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedProtectedConstructorOnExportedNoExtendPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedProtectedConstructorOnExportedNoExtendPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsRemovedPublicConstructorOnExportedNoExtendPublicClass() throws Exception {
     String[] methodRemovedError = getConstructorRemovedError();
     doBrokenApiTest("detectsRemovedPublicConstructorOnExportedNoExtendPublicClass", methodRemovedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedPublicConstructorOnExportedNoInstantiatePublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedPublicConstructorOnExportedNoInstantiatePublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedProtectedConstructorOnExportedNoExtendPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedProtectedConstructorOnExportedNoExtendPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedPublicConstructorOnExportedNoInstantiatePublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedPublicConstructorOnExportedNoInstantiatePublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedProtectedConstructorOnExportedNoInstantiatePublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedProtectedConstructorOnExportedNoInstantiatePublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedProtectedConstructorOnExportedNoInstantiatePublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedProtectedConstructorOnExportedNoInstantiatePublicClass");
   }

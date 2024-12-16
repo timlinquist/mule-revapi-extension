@@ -13,62 +13,64 @@ import static org.mule.tools.revapi.ApiErrorLogUtils.PUBLIC_FINAL;
 import static org.mule.tools.revapi.ApiErrorLogUtils.getMethodNowFinalError;
 
 import io.takari.maven.testing.executor.MavenRuntime;
-import org.junit.Test;
+import io.takari.maven.testing.executor.junit.MavenPluginTest;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(AbstractApiCheckTestCase.ApiCheckTestCaseContextProvider.class)
 public class MethodFinalModifierApiCheckTestCase extends AbstractApiCheckTestCase {
 
-  public MethodFinalModifierApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
-    super(builder, "methodFinalModifier");
+  public MethodFinalModifierApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, boolean isPromotedApi) throws Exception {
+    super(builder, "methodFinalModifier", isPromotedApi);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsAddedFinalModifierInPublicMethodOnExportedPublicClass() throws Exception {
     String[] methodNowFinalError = getMethodNowFinalError(PUBLIC, PUBLIC_FINAL);
     doBrokenApiTest("detectsAddedFinalModifierInPublicMethodOnExportedPublicClass", methodNowFinalError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedFinalModifierInPublicMethodOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedFinalModifierInPublicMethodOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsAddedFinalModifierInProtectedMethodOnExportedPublicClass() throws Exception {
     String[] methodNowFinalError = getMethodNowFinalError(PROTECTED, PROTECTED_FINAL);
     doBrokenApiTest("detectsAddedFinalModifierInProtectedMethodOnExportedPublicClass", methodNowFinalError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedFinalModifierInProtectedMethodOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedFinalModifierInProtectedMethodOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedFinalModifierInPackageMethodOnExportedPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedFinalModifierInPackageMethodOnExportedPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedFinalModifierInPrivateMethodOnExportedPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedFinalModifierInPrivateMethodOnExportedPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedFinalModifierInPublicMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedFinalModifierInPublicMethodOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedFinalModifierInProtectedMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedFinalModifierInProtectedMethodOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedFinalModifierInPackageMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedFinalModifierInPackageMethodOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedFinalModifierInPrivateMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedFinalModifierInPrivateMethodOnExportedPackageClass");
   }

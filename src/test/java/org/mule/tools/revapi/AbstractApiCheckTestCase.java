@@ -9,6 +9,7 @@ package org.mule.tools.revapi;
 import static org.mule.tools.revapi.ApiErrorLogUtils.API_ERROR_JUSTIFICATION;
 
 import static java.io.File.separator;
+import static java.lang.String.valueOf;
 import static java.lang.System.getProperty;
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.createDirectories;
@@ -32,16 +33,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
-import io.takari.maven.testing.TestResources;
+import io.takari.maven.testing.TestResources5;
 import io.takari.maven.testing.executor.MavenExecutionResult;
 import io.takari.maven.testing.executor.MavenRuntime;
-import io.takari.maven.testing.executor.junit.MavenJUnitTestRunner;
+import org.junit.jupiter.api.extension.Extension;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.extension.TestTemplateInvocationContext;
+import org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider;
 
-import org.junit.Rule;
-import org.junit.runner.RunWith;
-
-@RunWith(MavenJUnitTestRunner.class)
 public abstract class AbstractApiCheckTestCase {
 
   private static final Pattern moduleTitleStart = Pattern.compile("\\[INFO]\\s-+<.*>-+");
@@ -54,14 +58,21 @@ public abstract class AbstractApiCheckTestCase {
   private static final String MAVEN_BUILD_ERROR = "[INFO] BUILD FAILURE";
   private static final String REVAPI_CHECK = "Revapi check";
 
-  @Rule
-  public final TestResources resources = new TestResources();
+  @RegisterExtension
+  final TestResources5 resources = new TestResources5();
 
   private final MavenRuntime mavenRuntime;
-  private final String folder;
+  private String folder;
+  private boolean isPromotedApi = false;
 
   public AbstractApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, String folder) throws Exception {
-    this(builder, folder, "1.8");
+    this(builder, folder, "17");
+  }
+
+  public AbstractApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, String folder, boolean isPromotedApi)
+      throws Exception {
+    this(builder, folder, "17");
+    this.isPromotedApi = isPromotedApi;
   }
 
   public AbstractApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, String folder, String sourceLevel) throws Exception {
@@ -74,7 +85,7 @@ public abstract class AbstractApiCheckTestCase {
   }
 
   protected void doBrokenApiTest(String projectName, String[]... brokenApiLog) throws Exception {
-    MavenExecutionResult result = runMaven(projectName);
+    MavenExecutionResult result = validateMavenProject(projectName, isPromotedApi);
 
     List<String> logLines = getLogLines(result);
 
@@ -92,7 +103,7 @@ public abstract class AbstractApiCheckTestCase {
   }
 
   protected void doUnmodifiedApiTest(String projectName) throws Exception {
-    MavenExecutionResult result = runMaven(projectName);
+    MavenExecutionResult result = validateMavenProject(projectName, isPromotedApi);
 
     List<String> logLines = getLogLines(result);
 
@@ -105,14 +116,45 @@ public abstract class AbstractApiCheckTestCase {
     assertThat(reactorSummaryLog, not(hasItem(containsString(MAVEN_BUILD_ERROR))));
   }
 
-  private MavenExecutionResult runMaven(String projectName) throws Exception {
+  /**
+   * Executes maven, which will include an API check that takes into account if the project API should be validated as a
+   * standalone API or as a dependency of another API. In case of being validated as a dependency, a non-breaking API will be used
+   * as the main one.
+   * 
+   * @param projectName   The name of the project to validate.
+   * @param isPromotedApi True when the API should be validated as a dependency.
+   * @return The {@link MavenExecutionResult}.
+   * @throws Exception In case of maven fatal errors.
+   */
+  private MavenExecutionResult validateMavenProject(String projectName, boolean isPromotedApi) throws Exception {
+    MavenExecutionResult result;
+    if (isPromotedApi) {
+      // We need both API versions to be built. The we can use them as dependencies that should be promoted.
+      result = runMaven(projectName, "-Drevapi.skip=true");
+      // We do not need an intermediate folder: The promotedApi project is the same one for all the tests.
+      this.folder = "";
+      // This time we do the validation.
+      result = runMaven("promotedApi", isNewArtifactSnapshotVersion(result) ? "-DnewDependencyVersion=1.0.1-SNAPSHOT"
+          : "-DnewDependencyVersion=1.0.1");
+    } else {
+      result = runMaven(projectName);
+    }
+    return result;
+  }
+
+
+  private boolean isNewArtifactSnapshotVersion(MavenExecutionResult result) {
+    return result.getLog().stream().anyMatch(s -> s.contains("Building Foo Module 1.0.1-SNAPSHOT"));
+  }
+
+  private MavenExecutionResult runMaven(String projectName, String... additionalCliOptions) throws Exception {
     // To reuse a parent pom, it has to be manually copied to the expected folder
     Path parentPomFile = Paths.get(getProperty("user.dir"), "src/test/projects/parent/pom.xml");
     Path parentProjectFolder = new File(resources.getBasedir().getParent(), "parent").toPath();
     copy(parentPomFile, Paths.get(createDirectories(parentProjectFolder).toString(), "pom.xml"), REPLACE_EXISTING);
 
     File basedir = resources.getBasedir(folder + separator + projectName);
-    return mavenRuntime.forProject(basedir).execute("install");
+    return mavenRuntime.forProject(basedir).withCliOptions(additionalCliOptions).execute("install");
   }
 
   private Map<String, List<String>> splitLog(List<String> logLines) {
@@ -207,5 +249,49 @@ public abstract class AbstractApiCheckTestCase {
       throw new IllegalStateException(e);
     }
     return log;
+  }
+
+  public static class ApiCheckTestCaseContextProvider
+      implements TestTemplateInvocationContextProvider {
+
+    @Override
+    public boolean supportsTestTemplate(ExtensionContext context) {
+      return true;
+    }
+
+    @Override
+    public Stream<TestTemplateInvocationContext> provideTestTemplateInvocationContexts(
+                                                                                       ExtensionContext context) {
+
+      return Stream.of(invocationContext(true), invocationContext(false));
+    }
+
+    private TestTemplateInvocationContext invocationContext(boolean parameter) {
+      return new TestTemplateInvocationContext() {
+
+        @Override
+        public String getDisplayName(int invocationIndex) {
+          return "isPromotedAPI: " + parameter;
+        }
+
+        @Override
+        public List<Extension> getAdditionalExtensions() {
+          return Collections.singletonList(new ParameterResolver() {
+
+            @Override
+            public boolean supportsParameter(ParameterContext parameterContext,
+                                             ExtensionContext extensionContext) {
+              return parameterContext.getParameter().getType().equals(boolean.class);
+            }
+
+            @Override
+            public Object resolveParameter(ParameterContext parameterContext,
+                                           ExtensionContext extensionContext) {
+              return parameter;
+            }
+          });
+        }
+      };
+    }
   }
 }

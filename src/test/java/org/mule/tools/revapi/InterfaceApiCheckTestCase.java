@@ -12,86 +12,88 @@ import static org.mule.tools.revapi.ApiErrorLogUtils.getMethodAddedError;
 import static org.mule.tools.revapi.ApiErrorLogUtils.getMethodAddedToInterfaceError;
 
 import io.takari.maven.testing.executor.MavenRuntime;
-import org.junit.Test;
+import io.takari.maven.testing.executor.junit.MavenPluginTest;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(AbstractApiCheckTestCase.ApiCheckTestCaseContextProvider.class)
 public class InterfaceApiCheckTestCase extends AbstractApiCheckTestCase {
 
-  public InterfaceApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
-    super(builder, "interface");
+  public InterfaceApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, boolean isPromotedApi) throws Exception {
+    super(builder, "interface", isPromotedApi);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsApiChangesInExportedInterfaceInProtectedInnerClass() throws Exception {
     String[] methodAddedToInterfaceError = getMethodAddedToInterfaceError();
     String[] methodAddedError = getMethodAddedError(ORG_FOO_A_C);
     doBrokenApiTest("detectsApiChangesInExportedInterfaceInProtectedInnerClass", methodAddedToInterfaceError, methodAddedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresApiChangesInInternalInterfaceInProtectedInnerClass() throws Exception {
     doUnmodifiedApiTest("ignoresApiChangesInInternalInterfaceInProtectedInnerClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsApiChangesInExportedInterfaceInPublicClass() throws Exception {
     String[] methodAddedToInterfaceError = getMethodAddedToInterfaceError();
     String[] methodAddedError = getMethodAddedError(ORG_FOO_A);
     doBrokenApiTest("detectsApiChangesInExportedInterfaceInPublicClass", methodAddedToInterfaceError, methodAddedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresApiChangesInInternalInterfaceInPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresApiChangesInInternalInterfaceInPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsApiChangesInSuperInterfaceInExportedPublicInterface() throws Exception {
     String[] methodAddedToInterfaceError = getMethodAddedToInterfaceError();
     doBrokenApiTest("detectsApiChangesInSuperInterfaceInExportedPublicInterface", methodAddedToInterfaceError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresApiChangesInSuperInterfaceInInternalPublicInterface() throws Exception {
     doUnmodifiedApiTest("ignoresApiChangesInSuperInterfaceInInternalPublicInterface");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresChangesInSuperInterfaceInExportedPackageInterface() throws Exception {
     doUnmodifiedApiTest("ignoresChangesInSuperInterfaceInExportedPackageInterface");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresApiChangesInInterfaceInExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresApiChangesInInterfaceInExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresApiChangesInSuperInterfaceInExportedPrivateInnerInterface() throws Exception {
     doUnmodifiedApiTest("ignoresApiChangesInSuperInterfaceInExportedPrivateInnerInterface");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsApiChangesInSuperInterfaceInExportedProtectedInnerInterface() throws Exception {
     String[] methodAddedToInterfaceError = getMethodAddedToInterfaceError();
     doBrokenApiTest("detectsApiChangesInSuperInterfaceInExportedProtectedInnerInterface", methodAddedToInterfaceError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresApiChangesInSuperInterfaceInInternalProtectedInnerInterface() throws Exception {
     doUnmodifiedApiTest("ignoresApiChangesInSuperInterfaceInInternalProtectedInnerInterface");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresApiChangesInInterfaceInExportedPrivateInnerClass() throws Exception {
     doUnmodifiedApiTest("ignoresApiChangesInInterfaceInExportedPrivateInnerClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresApiChangesInExportedNoImplementInterfaceInPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresApiChangesInExportedNoImplementInterfaceInPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresApiChangesInExportedInterfaceExtendingNoImplementInterface() throws Exception {
     doUnmodifiedApiTest("ignoresApiChangesInExportedInterfaceExtendingNoImplementInterface");
   }

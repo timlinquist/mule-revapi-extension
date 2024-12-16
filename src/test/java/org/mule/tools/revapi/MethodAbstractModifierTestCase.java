@@ -13,52 +13,54 @@ import static org.mule.tools.revapi.ApiErrorLogUtils.PUBLIC_ABSTRACT;
 import static org.mule.tools.revapi.ApiErrorLogUtils.getMethodNowAbstractError;
 
 import io.takari.maven.testing.executor.MavenRuntime;
-import org.junit.Test;
+import io.takari.maven.testing.executor.junit.MavenPluginTest;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(AbstractApiCheckTestCase.ApiCheckTestCaseContextProvider.class)
 public class MethodAbstractModifierTestCase extends AbstractApiCheckTestCase {
 
-  public MethodAbstractModifierTestCase(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
-    super(builder, "methodAbstractModifier");
+  public MethodAbstractModifierTestCase(MavenRuntime.MavenRuntimeBuilder builder, boolean isPromotedApi) throws Exception {
+    super(builder, "methodAbstractModifier", isPromotedApi);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsAddedAbstractModifierInPublicMethodOnExportedPublicClass() throws Exception {
     String[] methodNowAbstractError = getMethodNowAbstractError(PUBLIC, PUBLIC_ABSTRACT);
     doBrokenApiTest("detectsAddedAbstractModifierInPublicMethodOnExportedPublicClass", methodNowAbstractError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedAbstractModifierInPublicMethodOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedAbstractModifierInPublicMethodOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsAddedAbstractModifierInProtectedMethodOnExportedPublicClass() throws Exception {
     String[] methodNowAbstractError = getMethodNowAbstractError(PROTECTED, PROTECTED_ABSTRACT);
     doBrokenApiTest("detectsAddedAbstractModifierInProtectedMethodOnExportedPublicClass", methodNowAbstractError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedAbstractModifierInProtectedMethodOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedAbstractModifierInPublicMethodOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedAbstractModifierInPackageMethodOnExportedPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedAbstractModifierInPackageMethodOnExportedPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedAbstractModifierInPublicMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedAbstractModifierInPublicMethodOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedAbstractModifierInProtectedMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedAbstractModifierInProtectedMethodOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedAbstractModifierInPackageMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedAbstractModifierInPackageMethodOnExportedPackageClass");
   }

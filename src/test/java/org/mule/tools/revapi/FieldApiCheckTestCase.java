@@ -9,91 +9,93 @@ package org.mule.tools.revapi;
 import static org.mule.tools.revapi.ApiErrorLogUtils.getFieldRemovedError;
 
 import io.takari.maven.testing.executor.MavenRuntime;
-import org.junit.Ignore;
-import org.junit.Test;
+import io.takari.maven.testing.executor.junit.MavenPluginTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(AbstractApiCheckTestCase.ApiCheckTestCaseContextProvider.class)
 public class FieldApiCheckTestCase extends AbstractApiCheckTestCase {
 
-  public FieldApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
-    super(builder, "field");
+  public FieldApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, boolean isPromotedApi) throws Exception {
+    super(builder, "field", isPromotedApi);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsRemovedPublicFieldOnExportedPublicClass() throws Exception {
     String[] fieldRemovedError = getFieldRemovedError();
     doBrokenApiTest("detectsRemovedPublicFieldOnExportedPublicClass", fieldRemovedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedPublicFieldOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedPublicFieldOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsRemovedProtectedFieldOnExportedPublicClass() throws Exception {
     String[] fieldRemovedError = getFieldRemovedError();
     doBrokenApiTest("detectsRemovedProtectedFieldOnExportedPublicClass", fieldRemovedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedProtectedFieldOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedProtectedFieldOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedPackageFieldOnExportedPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedPackageFieldOnExportedPublicClass");
   }
 
-  @Test
-  @Ignore("Revapi considers this a API change, but the class is final, so no subclasses will access this protected field")
+  @MavenPluginTest
+  @Disabled("Revapi considers this a API change, but the class is final, so no subclasses will access this protected field")
   public void ignoresRemovedProtectedFieldOnExportedPublicFinalClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedProtectedFieldOnExportedPublicFinalClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedChangeInExportedPrivateInstanceField() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedPrivateFieldOnExportedPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedPublicFieldOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedPublicFieldOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedProtectedFieldOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedProtectedFieldOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedPackageFieldOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedPackageFieldOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedPrivateFieldOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedPrivateFieldOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedProtectedFieldOnExportedNoExtendPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedProtectedFieldOnExportedNoExtendPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsRemovedPublicFieldOnExportedNoExtendPublicClass() throws Exception {
     String[] fieldRemovedError = getFieldRemovedError();
     doBrokenApiTest("detectsRemovedPublicFieldOnExportedNoExtendPublicClass", fieldRemovedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsRemovedPublicFieldOnExportedNoInstantiatePublicClass() throws Exception {
     String[] fieldRemovedError = getFieldRemovedError();
     doBrokenApiTest("detectsRemovedPublicFieldOnExportedNoInstantiatePublicClass", fieldRemovedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedProtectedFieldOnExportedNoInstantiatedPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedProtectedFieldOnExportedNoInstantiatedPublicClass");
   }

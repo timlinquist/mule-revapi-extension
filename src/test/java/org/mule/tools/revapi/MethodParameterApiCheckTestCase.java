@@ -11,159 +11,161 @@ import static org.mule.tools.revapi.ApiErrorLogUtils.STRING;
 import static org.mule.tools.revapi.ApiErrorLogUtils.getNumberOfParametersChangedError;
 
 import io.takari.maven.testing.executor.MavenRuntime;
-import org.junit.Test;
+import io.takari.maven.testing.executor.junit.MavenPluginTest;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(AbstractApiCheckTestCase.ApiCheckTestCaseContextProvider.class)
 public class MethodParameterApiCheckTestCase extends AbstractApiCheckTestCase {
 
-  public MethodParameterApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
-    super(builder, "methodParameter");
+  public MethodParameterApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, boolean isPromotedApi) throws Exception {
+    super(builder, "methodParameter", isPromotedApi);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsAddedParameterInPublicMethodOnExportedPublicClass() throws Exception {
     String[] numberOfParametersChangedError = getNumberOfParametersChangedError(EMPTY_PARAMS, STRING);
     doBrokenApiTest("detectsAddedParameterInPublicMethodOnExportedPublicClass", numberOfParametersChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedParameterInPublicMethodOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedParameterInPublicMethodOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsAddedParameterInProtectedMethodOnExportedPublicClass() throws Exception {
     String[] numberOfParametersChangedError = getNumberOfParametersChangedError(EMPTY_PARAMS, STRING);
     doBrokenApiTest("detectsAddedParameterInProtectedMethodOnExportedPublicClass", numberOfParametersChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedParameterInProtectedMethodOnExportedPublicNoExtendClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedParameterInProtectedMethodOnExportedPublicNoExtendClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsAddedParameterInPublicMethodOnExportedPublicNoExtendClass() throws Exception {
     String[] numberOfParametersChangedError = getNumberOfParametersChangedError(EMPTY_PARAMS, STRING);
     doBrokenApiTest("detectsAddedParameterInPublicMethodOnExportedPublicNoExtendClass", numberOfParametersChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedParameterInProtectedMethodOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedParameterInProtectedMethodOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedParameterInPackageMethodOnExportedPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedParameterInPackageMethodOnExportedPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedParameterInPrivateMethodOnExportedPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedParameterInPrivateMethodOnExportedPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedParameterInPublicMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedParameterInPublicMethodOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedParameterInProtectedMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedParameterInProtectedMethodOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedParameterInPackageMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedParameterInPackageMethodOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedParameterInPrivateMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedParameterInPrivateMethodOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsRemovedParameterInPublicMethodOnExportedPublicClass() throws Exception {
     String[] numberOfParametersChangedError = getNumberOfParametersChangedError(STRING, EMPTY_PARAMS);
 
     doBrokenApiTest("detectsRemovedParameterInPublicMethodOnExportedPublicClass", numberOfParametersChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedParameterInPublicMethodOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedParameterInPublicMethodOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsRemovedParameterInProtectedMethodOnExportedPublicClass() throws Exception {
     String[] numberOfParametersChangedError = getNumberOfParametersChangedError(STRING, EMPTY_PARAMS);
     doBrokenApiTest("detectsRemovedParameterInProtectedMethodOnExportedPublicClass", numberOfParametersChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedParameterInProtectedMethodOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedParameterInProtectedMethodOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedParameterInPackageMethodOnExportedPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedParameterInPackageMethodOnExportedPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedParameterInPrivateMethodOnExportedPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedParameterInPrivateMethodOnExportedPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedParameterInPublicMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedParameterInPublicMethodOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedParameterInProtectedMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedParameterInProtectedMethodOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedParameterInPackageMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedParameterInPackageMethodOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedParameterInPrivateMethodOnExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedParameterInPrivateMethodOnExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedParameterInProtectedMethodOnExportedPublicNoExtendClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedParameterInProtectedMethodOnExportedPublicNoExtendClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsRemovedParameterInPublicMethodOnExportedPublicNoExtendClass() throws Exception {
     String[] numberOfParametersChangedError = getNumberOfParametersChangedError(STRING, EMPTY_PARAMS);
     doBrokenApiTest("detectsRemovedParameterInPublicMethodOnExportedPublicNoExtendClass", numberOfParametersChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsAddedParameterInPublicMethodOnExportedPublicNoInstantiateClass() throws Exception {
     String[] numberOfParametersChangedError = getNumberOfParametersChangedError(EMPTY_PARAMS, STRING);
     doBrokenApiTest("detectsAddedParameterInPublicMethodOnExportedPublicNoInstantiateClass", numberOfParametersChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsRemovedParameterInPublicMethodOnExportedPublicNoInstantiateClass() throws Exception {
     String[] numberOfParametersChangedError = getNumberOfParametersChangedError(STRING, EMPTY_PARAMS);
     doBrokenApiTest("detectsRemovedParameterInPublicMethodOnExportedPublicNoInstantiateClass", numberOfParametersChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedParameterInProtectedMethodOnExportedPublicNoInstantiateClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedParameterInProtectedMethodOnExportedPublicNoInstantiateClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresRemovedParameterInProtectedMethodOnExportedPublicNoInstantiateClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedParameterInProtectedMethodOnExportedPublicNoInstantiateClass");
   }

@@ -17,58 +17,60 @@ import static org.mule.tools.revapi.ApiErrorLogUtils.PUBLIC_STATIC_FINAL;
 import static org.mule.tools.revapi.ApiErrorLogUtils.getClassNowFinalErrorLog;
 
 import io.takari.maven.testing.executor.MavenRuntime;
-import org.junit.Test;
+import io.takari.maven.testing.executor.junit.MavenPluginTest;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(AbstractApiCheckTestCase.ApiCheckTestCaseContextProvider.class)
 public class ClassFinalModifierApiCheckTestCase extends AbstractApiCheckTestCase {
 
-  public ClassFinalModifierApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
-    super(builder, "classFinalModifier");
+  public ClassFinalModifierApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, boolean isPromotedApi) throws Exception {
+    super(builder, "classFinalModifier", isPromotedApi);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsAddedStaticModifierInExportedPublicClass() throws Exception {
     String[] classNowFinalErrorLog = getClassNowFinalErrorLog(ORG_FOO_A, PUBLIC, PUBLIC_FINAL);
     doBrokenApiTest("detectsAddedStaticModifierInExportedPublicClass", classNowFinalErrorLog);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresPublicToPackageInternalClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedStaticModifierInInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedStaticModifierInExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedStaticModifierInExportedPackageClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsAddedStaticModifierInExportedPublicInnerClass() throws Exception {
     String[] classNowFinalErrorLog = getClassNowFinalErrorLog(ORG_FOO_A_B, PUBLIC_STATIC, PUBLIC_STATIC_FINAL);
     doBrokenApiTest("detectsAddedStaticModifierInExportedPublicInnerClass", classNowFinalErrorLog);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedStaticModifierInInternalPublicInnerClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedStaticModifierInInternalPublicInnerClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsAddedStaticModifierInExportedProtectedInnerClass() throws Exception {
     String[] classNowFinalErrorLog = getClassNowFinalErrorLog(ORG_FOO_A_B, PROTECTED_STATIC, PROTECTED_STATIC_FINAL);
     doBrokenApiTest("detectsAddedStaticModifierInExportedProtectedInnerClass", classNowFinalErrorLog);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedStaticModifierInInternalProtectedInnerClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedStaticModifierInInternalProtectedInnerClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedStaticModifierInExportedPackageInnerClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedStaticModifierInExportedPackageInnerClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresAddedStaticModifierInExportedPrivateInnerClass() throws Exception {
     doUnmodifiedApiTest("ignoresAddedStaticModifierInExportedPrivateInnerClass");
   }

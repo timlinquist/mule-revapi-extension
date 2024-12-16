@@ -11,64 +11,66 @@ import static org.mule.tools.revapi.ApiErrorLogUtils.ORG_FOO_A;
 import static org.mule.tools.revapi.ApiErrorLogUtils.getParameterTypeChangedError;
 
 import io.takari.maven.testing.executor.MavenRuntime;
-import org.junit.Test;
+import io.takari.maven.testing.executor.junit.MavenPluginTest;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(AbstractApiCheckTestCase.ApiCheckTestCaseContextProvider.class)
 public class MethodParameterTypeApiCheckTestCase extends AbstractApiCheckTestCase {
 
-  public MethodParameterTypeApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder) throws Exception {
-    super(builder, "methodParameterType");
+  public MethodParameterTypeApiCheckTestCase(MavenRuntime.MavenRuntimeBuilder builder, boolean isPromotedApi) throws Exception {
+    super(builder, "methodParameterType", isPromotedApi);
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsTypeParameterChangeInPublicMethodOnExportedPublicClass() throws Exception {
     String[] parameterTypeChangedError = getParameterTypeChangedError(ORG_FOO_A, DO_STUFF_METHOD);
     doBrokenApiTest("detectsTypeParameterChangeInPublicMethodOnExportedPublicClass", parameterTypeChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresTypeParameterChangeInPublicMethodOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresTypeParameterChangeInPublicMethodOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsTypeParameterChangeInProtectedMethodOnExternalPublicClass() throws Exception {
     String[] parameterTypeChangedError = getParameterTypeChangedError(ORG_FOO_A, DO_STUFF_METHOD);
     doBrokenApiTest("detectsTypeParameterChangeInProtectedMethodOnExternalPublicClass", parameterTypeChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresTypeParameterChangeInProtectedMethodOnInternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresTypeParameterChangeInProtectedMethodOnInternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresTypeParameterChangeInPackageMethodOnExternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresTypeParameterChangeInPackageMethodOnExternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresTypeParameterChangeInPrivatedMethodOnExternalPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresTypeParameterChangeInPrivatedMethodOnExternalPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresTypeParameterChangeInProtectedMethodOnExportedNoExtendPublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresTypeParameterChangeInProtectedMethodOnExportedNoExtendPublicClass");
   }
 
-  @Test
+  @MavenPluginTest
   public void detectsTypeParameterChangeInPublicMethodOnExportedNoExtendPublicClass() throws Exception {
     String[] parameterTypeChangedError = getParameterTypeChangedError(ORG_FOO_A, DO_STUFF_METHOD);
     doBrokenApiTest("detectsTypeParameterChangeInPublicMethodOnExportedNoExtendPublicClass", parameterTypeChangedError);
   }
 
-  @Test
+  @MavenPluginTest
   public void ignoresTypeParameterChangeInProtectedMethodOnExportedNoInstantiatePublicClass() throws Exception {
     doUnmodifiedApiTest("ignoresTypeParameterChangeInProtectedMethodOnExportedNoInstantiatePublicClass");
   }
 
 
-  @Test
+  @MavenPluginTest
   public void detectsTypeParameterChangeInPublicMethodOnExportedNoInstantiatePublicClass() throws Exception {
     String[] parameterTypeChangedError = getParameterTypeChangedError(ORG_FOO_A, DO_STUFF_METHOD);
     doBrokenApiTest("detectsTypeParameterChangeInPublicMethodOnExportedNoInstantiatePublicClass", parameterTypeChangedError);
