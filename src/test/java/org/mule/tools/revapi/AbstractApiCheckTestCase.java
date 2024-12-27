@@ -9,7 +9,6 @@ package org.mule.tools.revapi;
 import static org.mule.tools.revapi.ApiErrorLogUtils.API_ERROR_JUSTIFICATION;
 
 import static java.io.File.separator;
-import static java.lang.String.valueOf;
 import static java.lang.System.getProperty;
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.createDirectories;
