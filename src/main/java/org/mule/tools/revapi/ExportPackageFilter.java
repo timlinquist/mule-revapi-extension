@@ -6,6 +6,16 @@
  */
 package org.mule.tools.revapi;
 
+import static java.lang.ClassLoader.getSystemClassLoader;
+import static java.lang.ModuleLayer.boot;
+import static java.lang.ModuleLayer.defineModulesWithOneLoader;
+import static java.lang.module.ModuleFinder.ofSystem;
+import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.stream.Stream.concat;
+import static java.util.stream.StreamSupport.stream;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,10 +28,8 @@ import java.lang.module.ModuleFinder;
 import java.lang.module.ModuleReference;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -30,7 +38,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import org.revapi.API;
 import org.revapi.AnalysisContext;
@@ -41,16 +48,6 @@ import org.revapi.java.model.TypeElement;
 import org.revapi.java.spi.JavaTypeElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static java.lang.ClassLoader.getSystemClassLoader;
-import static java.lang.ModuleLayer.boot;
-import static java.lang.ModuleLayer.defineModulesWithOneLoader;
-import static java.lang.module.ModuleFinder.ofSystem;
-import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
-import static java.util.Optional.empty;
-import static java.util.stream.Stream.concat;
-import static java.util.stream.StreamSupport.stream;
 
 /**
  * Filters elements that are not part of a given Mule module API, so the API modification checks are not executed on them.
