@@ -6,8 +6,6 @@
  */
 package org.mule.tools.revapi;
 
-import java.lang.module.ModuleDescriptor;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,20 +13,21 @@ public class JavaModuleSystemExportedPackages implements ExportedPackages {
 
   private static final Logger LOG = LoggerFactory.getLogger(JavaModuleSystemExportedPackages.class);
 
-  private final ModuleDescriptor descriptor;
+  private final Module module;
 
-  public JavaModuleSystemExportedPackages(ModuleDescriptor descriptor) {
-    this.descriptor = descriptor;
+  public JavaModuleSystemExportedPackages(Module module) {
+    this.module = module;
   }
 
   @Override
   public boolean isExported(String packageName) {
-    return descriptor.isAutomatic() || descriptor.exports().stream().anyMatch(exports -> exports.source().equals(packageName));
+    return module.getDescriptor().isAutomatic()
+        || module.getDescriptor().exports().stream().anyMatch(exports -> exports.source().equals(packageName));
   }
 
   @Override
   public void logExportedPackages() {
-    LOG.info("Adding exported packages from Java Module: {}\nexports: {}", descriptor.name(),
-             descriptor.isAutomatic() ? "ALL (automatic module)" : descriptor.exports());
+    LOG.info("Adding exported packages from Java Module: {}\nexports: {}", module.getDescriptor().name(),
+             module.getDescriptor().isAutomatic() ? "ALL (automatic module)" : module.getDescriptor().exports());
   }
 }

@@ -13,11 +13,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.lang.module.Configuration;
 import java.lang.module.ModuleFinder;
 import java.lang.module.ModuleReference;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -25,6 +29,8 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.revapi.API;
 import org.revapi.AnalysisContext;
@@ -35,6 +41,16 @@ import org.revapi.java.model.TypeElement;
 import org.revapi.java.spi.JavaTypeElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.lang.ClassLoader.getSystemClassLoader;
+import static java.lang.ModuleLayer.boot;
+import static java.lang.ModuleLayer.defineModulesWithOneLoader;
+import static java.lang.module.ModuleFinder.ofSystem;
+import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
+import static java.util.Optional.empty;
+import static java.util.stream.Stream.concat;
+import static java.util.stream.StreamSupport.stream;
 
 /**
  * Filters elements that are not part of a given Mule module API, so the API modification checks are not executed on them.
@@ -102,7 +118,7 @@ public final class ExportPackageFilter implements ElementFilter {
   private Set<ExportedPackages> getExportedPackages(API api) {
     Set<ExportedPackages> exportedPackages = new HashSet<>();
     api.getArchives().forEach(archive -> {
-      if (!addJavaModuleSystemExportedPackages(archive, exportedPackages)) {
+      if (!addJavaModuleSystemExportedPackages(api, archive, exportedPackages)) {
         if (!addMuleModuleSystemExportedPackages(archive, exportedPackages)) {
           LOG.debug("No exported packages found for the archive {}.", archive.getName());
         }
@@ -136,15 +152,15 @@ public final class ExportPackageFilter implements ElementFilter {
     return false;
   }
 
-  private boolean addJavaModuleSystemExportedPackages(Archive archive, Set<ExportedPackages> exportedPackages) {
-    Optional<ModuleReference> moduleReference = findModule(archive);
+  private boolean addJavaModuleSystemExportedPackages(API api, Archive archive, Set<ExportedPackages> exportedPackages) {
+    Optional<ModuleReference> moduleReference = findJpmsModuleReference(archive);
     if (moduleReference.isPresent()) {
       ModuleReference module = moduleReference.get();
       // TODO: Evaluate introducing config modes: MIXED: JPMS with MMS as fallback, JPMS: JPMS only, MULE: MMS only.
       if (!module.descriptor().isAutomatic()
           // Automatic modules must prioritize MuleModuleSystem descriptors.
           || (isMixedMode && !addMuleModuleSystemExportedPackages(archive, exportedPackages))) {
-        ExportedPackages javaModuleSystemExportedPackages = new JavaModuleSystemExportedPackages(module.descriptor());
+        ExportedPackages javaModuleSystemExportedPackages = new JavaModuleSystemExportedPackages(loadJpmsModule(module, api));
         if (isVerboseLogging()) {
           javaModuleSystemExportedPackages.logExportedPackages();
         }
@@ -186,25 +202,48 @@ public final class ExportPackageFilter implements ElementFilter {
     return exported;
   }
 
-  private Optional<ModuleReference> findModule(Archive archive) {
-    try {
-      Field archiveFile = archive.getClass().getDeclaredField("file");
-      archiveFile.setAccessible(true);
-      ModuleFinder moduleFinder = ModuleFinder.of(((File) archiveFile.get(archive)).toPath());
-      Set<ModuleReference> moduleReferences = moduleFinder.findAll();
+  private Module loadJpmsModule(ModuleReference moduleReference, API api) {
+    // TODO: Introduce module layer cache.
+    final Path[] apiModulePath = concat(stream(api.getArchives().spliterator(), true),
+                                        api.getSupplementaryArchives() != null
+                                            ? stream(api.getSupplementaryArchives().spliterator(), true)
+                                            : Stream.empty()).map(ExportPackageFilter::getPath).toArray(Path[]::new);
+    final ModuleFinder finder = ModuleFinder.of(apiModulePath);
+    final Configuration configuration =
+        boot().configuration().resolve(finder, ofSystem(), singleton(moduleReference.descriptor().name()));
+    ModuleLayer.Controller controller = defineModulesWithOneLoader(configuration,
+                                                                   singletonList(boot()),
+                                                                   getSystemClassLoader());
+    return controller.layer().findModule(moduleReference.descriptor().name())
+        .orElseThrow(() -> new RuntimeException("Could not find jpms module: " + moduleReference.descriptor().name() + " at API: "
+            + api));
+  }
 
+  private Optional<ModuleReference> findJpmsModuleReference(Archive archive) {
+    try {
+      ModuleFinder moduleFinder = ModuleFinder.of(getPath(archive));
+      Set<ModuleReference> moduleReferences = moduleFinder.findAll();
       if (moduleReferences.size() > 1) {
-        throw new IllegalArgumentException("More than one module found for the archive " + archive.getName() + ": "
+        throw new IllegalArgumentException("More than one jpms module found for the archive " + archive.getName() + ": "
             + getModuleNames(moduleReferences));
       }
-
       if (moduleReferences.isEmpty()) {
-        return Optional.empty();
+        return empty();
       } else {
         return Optional.of(moduleReferences.iterator().next());
       }
     } catch (Exception e) {
       LOG.error("Error while finding modules for archive: {}", archive.getName(), e);
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static Path getPath(Archive archive) {
+    try {
+      Field archiveFile = archive.getClass().getDeclaredField("file");
+      archiveFile.setAccessible(true);
+      return ((File) archiveFile.get(archive)).toPath();
+    } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
