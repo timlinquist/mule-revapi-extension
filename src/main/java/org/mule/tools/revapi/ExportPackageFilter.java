@@ -48,13 +48,15 @@ public final class ExportPackageFilter implements ElementFilter {
   private final Map<API, Set<ExportedPackages>> apiModulesExportedPackages = new HashMap<>();
   private final Map<Element<?>, Boolean> apiExportedElements = new HashMap<>();
 
-  private final boolean isMixedMode = false;
-
   @Override
   public void close() {}
 
   private static boolean isVerboseLogging() {
     return System.getProperty("mule.revapi.verbose") != null;
+  }
+
+  private static String getModuleSystemMode() {
+    return System.getProperty("mule.revapi.moduleSystem.mode", "MULE");
   }
 
   @Override
@@ -113,46 +115,51 @@ public final class ExportPackageFilter implements ElementFilter {
   }
 
   private boolean addMuleModuleSystemExportedPackages(Archive archive, Set<ExportedPackages> exportedPackages) {
-    try (JarInputStream jarFile = new JarInputStream(archive.openStream())) {
-      JarEntry entry;
-      while ((entry = jarFile.getNextJarEntry()) != null) {
-        String name = entry.getName();
-        if (name.equals("META-INF/mule-module.properties")) {
-          Properties properties = getProperties(jarFile);
-          ExportedPackages muleModuleSystemExportedPackages = new MuleModuleSystemExportedPackages(properties);
-          if (isVerboseLogging()) {
-            muleModuleSystemExportedPackages.logExportedPackages();
+    if (isMixedMode() || isMuleMode()) {
+      try (JarInputStream jarFile = new JarInputStream(archive.openStream())) {
+        JarEntry entry;
+        while ((entry = jarFile.getNextJarEntry()) != null) {
+          String name = entry.getName();
+          if (name.equals("META-INF/mule-module.properties")) {
+            Properties properties = getProperties(jarFile);
+            ExportedPackages muleModuleSystemExportedPackages = new MuleModuleSystemExportedPackages(properties);
+            if (isVerboseLogging()) {
+              muleModuleSystemExportedPackages.logExportedPackages();
+            }
+            exportedPackages.add(muleModuleSystemExportedPackages);
+            return true;
           }
-          exportedPackages.add(muleModuleSystemExportedPackages);
-          return true;
         }
+      } catch (IOException e) {
+        LOG.debug("Failed to open the archive {} as a jar.", archive.getName(), e);
       }
-    } catch (IOException e) {
-      LOG.debug("Failed to open the archive {} as a jar.", archive.getName(), e);
+      LOG.debug("No Mule Module System descriptor found for the archive {}.", archive.getName());
+      return false;
     }
-    LOG.debug("No Mule Module System descriptor found for the archive {}.", archive.getName());
     return false;
   }
 
   private boolean addJavaModuleSystemExportedPackages(API api, Archive archive, Set<ExportedPackages> exportedPackages) {
-    Optional<ModuleReference> moduleReference = findJpmsModuleReference(archive);
-    if (moduleReference.isPresent()) {
-      ModuleReference module = moduleReference.get();
-      // TODO: Evaluate introducing config modes: MIXED: JPMS with MMS as fallback, JPMS: JPMS only, MULE: MMS only.
-      if (!module.descriptor().isAutomatic()
-          // Automatic modules must prioritize MuleModuleSystem descriptors.
-          || (isMixedMode && !addMuleModuleSystemExportedPackages(archive, exportedPackages))) {
-        ExportedPackages javaModuleSystemExportedPackages = new JavaModuleSystemExportedPackages(module, api);
-        if (isVerboseLogging()) {
-          javaModuleSystemExportedPackages.logExportedPackages();
+    if (isJavaMode() || isMixedMode()) {
+      Optional<ModuleReference> optionalModuleReference = findJpmsModuleReference(archive);
+      if (optionalModuleReference.isPresent()) {
+        ModuleReference moduleReference = optionalModuleReference.get();
+        if (!moduleReference.descriptor().isAutomatic()
+            // Automatic modules must prioritize MuleModuleSystem descriptors when mode is MIXED.
+            || (isMixedMode() && !addMuleModuleSystemExportedPackages(archive, exportedPackages))) {
+          ExportedPackages javaModuleSystemExportedPackages = new JavaModuleSystemExportedPackages(moduleReference);
+          if (isVerboseLogging()) {
+            javaModuleSystemExportedPackages.logExportedPackages();
+          }
+          exportedPackages.add(javaModuleSystemExportedPackages);
         }
-        exportedPackages.add(javaModuleSystemExportedPackages);
+        return true;
+      } else {
+        LOG.debug("No Java Module System descriptor found for the archive: {}.", archive.getName());
+        return false;
       }
-      return true;
-    } else {
-      LOG.debug("No Java Module System descriptor found for the archive: {}.", archive.getName());
-      return false;
     }
+    return false;
   }
 
   private TypeElement findOwnerJavaTypeElement(Element<?> element) {
@@ -209,7 +216,15 @@ public final class ExportPackageFilter implements ElementFilter {
   }
 
   private boolean isMixedMode() {
-    return isMixedMode;
+    return getModuleSystemMode().equals("MIXED");
+  }
+
+  private boolean isMuleMode() {
+    return getModuleSystemMode().equals("MULE");
+  }
+
+  private boolean isJavaMode() {
+    return getModuleSystemMode().equals("JAVA");
   }
 
   private void logIsExported(Element<?> element, boolean exported) {
