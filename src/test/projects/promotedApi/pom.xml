@@ -30,7 +30,7 @@
                         <id>api-check</id>
                         <goals><goal>check</goal></goals>
                         <configuration>
-                            <!-- This will be removed after the configuration is automatically generated -->
+                            <!-- This will be removed as part of W-17457894  -->
                             <promotedDependencies>
                                 <dependency>
                                     <artifactId>empty-project</artifactId>
