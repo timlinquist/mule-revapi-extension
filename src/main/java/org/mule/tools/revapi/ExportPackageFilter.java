@@ -42,7 +42,7 @@ public final class ExportPackageFilter implements ElementFilter {
   }
 
   private static String getModuleSystemMode() {
-    return System.getProperty("mule.revapi.moduleSystem.mode", "MULE");
+    return System.getProperty("mule.revapi.moduleSystem.mode", "MIXED");
   }
 
   @Override
