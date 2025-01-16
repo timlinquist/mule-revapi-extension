@@ -14,9 +14,12 @@ import org.revapi.AnalysisContext;
 import org.revapi.Archive;
 import org.revapi.Element;
 import org.revapi.ElementFilter;
+import org.revapi.java.model.TypeElement;
 import org.revapi.java.spi.JavaModelElement;
+import org.revapi.java.spi.JavaTypeElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 import static java.util.Objects.requireNonNull;
 
@@ -65,7 +68,27 @@ public final class ExportPackageFilter implements ElementFilter {
 
   @Override
   public boolean applies(Element element) {
-    return isApiElement(element);
+    boolean exported;
+    if (element instanceof JavaTypeElement) {
+      exported = isApiElement(element);
+    } else {
+      TypeElement ownerJavaTypeElement = findOwnerJavaTypeElement(element);
+
+      exported = isApiElement(ownerJavaTypeElement);
+    }
+    return exported;
+  }
+
+  private TypeElement findOwnerJavaTypeElement(Element element) {
+    while (!(element instanceof JavaTypeElement) || element.getParent() instanceof TypeElement) {
+      element = element.getParent();
+    }
+
+    if (!(element instanceof JavaTypeElement)) {
+      throw new IllegalStateException("Cannot find the parent type element for: " + element);
+    }
+
+    return (TypeElement) element;
   }
 
   @Override
@@ -129,6 +152,7 @@ public final class ExportPackageFilter implements ElementFilter {
     isApiElement.put(element, isApi);
     return isApi;
   }
+
 
   private boolean isMixedMode() {
     return getModuleSystemMode().equals("MIXED");
