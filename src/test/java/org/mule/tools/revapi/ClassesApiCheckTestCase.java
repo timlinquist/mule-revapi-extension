@@ -95,4 +95,9 @@ public class ClassesApiCheckTestCase extends AbstractApiCheckTestCase {
   public void ignoresRemovedExportedPackageClass() throws Exception {
     doUnmodifiedApiTest("ignoresRemovedExportedPackageClass");
   }
+
+  @MavenPluginTest
+  public void ignoresChangesInInternalSubClassOfExportedSuperClass() throws Exception {
+    doUnmodifiedApiTest("ignoresChangesInInternalSubClassOfExportedSuperClass");
+  }
 }
