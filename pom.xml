@@ -13,7 +13,7 @@
 
     <groupId>org.mule.tools.maven</groupId>
     <artifactId>mule-revapi-extension</artifactId>
-    <version>1.9.0-rc2</version>
+    <version>1.9.0-rc3</version>
 
     <name>Mule Revapi Extension</name>
     <description>Provides support for accepting API boundaries defined by Mule modules.</description>
