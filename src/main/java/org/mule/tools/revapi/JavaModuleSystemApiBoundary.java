@@ -6,8 +6,8 @@
  */
 package org.mule.tools.revapi;
 
-import org.revapi.java.model.TypeElement;
 import org.revapi.java.spi.JavaModelElement;
+import org.revapi.java.spi.JavaTypeElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public class JavaModuleSystemApiBoundary implements ApiBoundary {
   }
 
   @Override
-  public boolean isApi(TypeElement element) {
+  public boolean isApi(JavaTypeElement element) {
     return exportedPackages.contains(getPackageName(element));
   }
 

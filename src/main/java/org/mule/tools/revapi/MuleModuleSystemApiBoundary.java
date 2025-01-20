@@ -18,7 +18,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
 import org.revapi.Archive;
-import org.revapi.java.model.TypeElement;
+import org.revapi.java.spi.JavaTypeElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +59,7 @@ public class MuleModuleSystemApiBoundary implements ApiBoundary {
 
   // TODO: Validate that the element we receive comes from the archive used to create this instance.
   @Override
-  public boolean isApi(TypeElement element) {
+  public boolean isApi(JavaTypeElement element) {
     String packageName = getPackageName(element);
     return standardPackages.contains(packageName) || privilegedPackages.contains(packageName);
   }

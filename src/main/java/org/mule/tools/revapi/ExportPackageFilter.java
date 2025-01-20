@@ -7,7 +7,9 @@
 package org.mule.tools.revapi;
 
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.revapi.AnalysisContext;
@@ -15,6 +17,7 @@ import org.revapi.Archive;
 import org.revapi.Element;
 import org.revapi.ElementFilter;
 import org.revapi.java.spi.JavaModelElement;
+import org.revapi.java.spi.JavaTypeElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +36,7 @@ public final class ExportPackageFilter implements ElementFilter {
 
   private final Map<Archive, ApiBoundary> apiBoundaries = new HashMap<>();
   private final Map<Element<?>, Boolean> isApiElement = new HashMap<>();
+  private final List<Integer> hashes = new ArrayList<>();
 
   @Override
   public void close() {}
@@ -70,9 +74,9 @@ public final class ExportPackageFilter implements ElementFilter {
 
   @Override
   public boolean shouldDescendInto(Object element) {
-    boolean descendInto = element instanceof Element && isApiElement((Element<?>) element);
+    boolean descendInto = element instanceof JavaTypeElement && isApiElement((JavaTypeElement) element);
     if (isVerboseLogging()) {
-      LOG.info("{}: should descend into {}", descendInto, element);
+      LOG.info("Filter {} descend into {}", descendInto ? "Will" : "Will NOT", element);
     }
     return descendInto;
   }
@@ -117,16 +121,28 @@ public final class ExportPackageFilter implements ElementFilter {
   }
 
   private boolean isApiElement(Element<?> element) {
-    if (isApiElement.containsKey(element)) {
-      return isApiElement.get(element);
-    }
-    boolean isApi = apiBoundaries.containsKey(element.getArchive())
-        && apiBoundaries.computeIfAbsent(element.getArchive(), archive -> getApiBoundaries(element))
+
+    // synchronized (isApiElement) {
+    // if (isApiElement.containsKey(element.toString())) {
+    // return isApiElement.get(element.toString());
+    // }
+    // }
+
+    boolean isApi = false;
+    synchronized (apiBoundaries) {
+      if (apiBoundaries.containsKey(element.getArchive())) {
+        isApi = apiBoundaries.computeIfAbsent(element.getArchive(), archive -> getApiBoundaries(element))
             .isApi(element);
-    if (isVerboseLogging()) {
-      logIsExported(element, isApi);
+      }
     }
-    isApiElement.put(element, isApi);
+    if (isVerboseLogging()) {
+      logIsApi(element, isApi);
+    }
+
+    // synchronized (isApiElement) {
+    // isApiElement.put(element, isApi);
+    // }
+
     return isApi;
   }
 
@@ -142,7 +158,7 @@ public final class ExportPackageFilter implements ElementFilter {
     return getModuleSystemMode().equals("JAVA");
   }
 
-  private void logIsExported(Element<?> element, boolean exported) {
-    LOG.info("{} : applies to {}", exported, element);
+  private void logIsApi(Element<?> element, boolean isApi) {
+    LOG.info("{} is {}", element, isApi ? "part of the API" : "NOT part of the API");
   }
 }
