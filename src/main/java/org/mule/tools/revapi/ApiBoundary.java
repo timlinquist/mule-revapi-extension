@@ -6,11 +6,10 @@
  */
 package org.mule.tools.revapi;
 
-import org.revapi.Element;
-import org.revapi.java.model.TypeElement;
-import org.revapi.java.spi.JavaTypeElement;
-
 import static java.util.Objects.requireNonNull;
+
+import org.revapi.Element;
+import org.revapi.java.spi.JavaTypeElement;
 
 public interface ApiBoundary {
 
@@ -19,22 +18,19 @@ public interface ApiBoundary {
    * @return True if the element is part of the API.
    */
   default boolean isApi(Element<?> element) {
-    Element<?> ownerElement = element;
-    if (!(ownerElement instanceof JavaTypeElement)) {
-      ownerElement = ApiBoundary.findJavaTypeElement(element);
-    }
-    JavaTypeElement finalElement = (JavaTypeElement) ownerElement;
-    return isApi(finalElement);
+    return isApi(findParentJavaTypeElement(element));
   }
 
+  /**
+   * @param element The element that is going to be checked.
+   * @return True if the element is part of the API.
+   */
   boolean isApi(JavaTypeElement element);
 
   /**
-   * @return true if any valid call to {@link #isApi(Element)} or {@link #isApi(TypeElement)} will return false.
+   * @return true if any valid call to {@link #isApi(Element)} or {@link #isApi(JavaTypeElement)} will return false.
    */
   boolean isEmpty();
-
-  void logApiPackages();
 
   default String getPackageName(JavaTypeElement element) {
     String canonicalName = element.getDeclaringElement().getQualifiedName().toString();
@@ -43,13 +39,13 @@ public interface ApiBoundary {
   }
 
   /**
-   * Walks the {@link Element} hierarchy up in order to find the first {@link TypeElement}, which represents a Java class.
-   *
-   * @param element The element that will be walked. Will be returned right away if it is a {@link TypeElement}.
-   * @return The first {@link TypeElement} found.
-   * @throws IllegalStateException If no {@link TypeElement} could be found.
+   * Walks the {@link Element} hierarchy up in order to return the top parent {@link JavaTypeElement} found.
+   * 
+   * @param element The element that will be walked.
+   * @return The top {@link JavaTypeElement} found.
+   * @throws IllegalStateException If no {@link JavaTypeElement} could be found.
    */
-  private static JavaTypeElement findJavaTypeElement(Element<?> element) {
+  private static JavaTypeElement findParentJavaTypeElement(Element<?> element) {
     requireNonNull(element, "Element must not be null.");
     Element<?> typeElement = element;
     while (typeElement != null

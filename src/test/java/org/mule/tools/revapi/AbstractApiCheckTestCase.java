@@ -263,7 +263,7 @@ public abstract class AbstractApiCheckTestCase {
     public Stream<TestTemplateInvocationContext> provideTestTemplateInvocationContexts(
                                                                                        ExtensionContext context) {
 
-      return Stream.of(invocationContext(false));
+      return Stream.of(invocationContext(false), invocationContext(true));
     }
 
     private TestTemplateInvocationContext invocationContext(boolean parameter) {

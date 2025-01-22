@@ -43,19 +43,19 @@
                                             }
                                         },
                                         "versions": {
-                                        "enabled": true,
-                                        "versionIncreaseAllows": {
-                                            "major": {
-                                                "severity": "BREAKING"
+                                            "enabled": true,
+                                            "versionIncreaseAllows": {
+                                                "major": {
+                                                    "severity": "BREAKING"
+                                                },
+                                                "minor": {
+                                                    "severity": "NON_BREAKING"
+                                                },
+                                                "patch": {
+                                                    "severity": "EQUIVALENT"
+                                                }
                                             },
-                                            "minor": {
-                                                "severity": "NON_BREAKING"
-                                            },
-                                            "patch": {
-                                                "severity": "EQUIVALENT"
-                                            }
-                                        },
-                                        "passThroughDifference": ["java.class.nonPublicPartOfAPI"]
+                                            "passThroughDifference": ["java.class.nonPublicPartOfAPI"]
                                         }
                                     }
                                 }

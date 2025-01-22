@@ -6,12 +6,18 @@
  */
 package org.mule.tools.revapi;
 
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
+
 import java.io.Reader;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.revapi.AnalysisContext;
 import org.revapi.Archive;
 import org.revapi.Element;
@@ -20,8 +26,6 @@ import org.revapi.java.spi.JavaModelElement;
 import org.revapi.java.spi.JavaTypeElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * Filters elements that are not part of a given Mule module API, so the API modification checks are not executed on them.
@@ -32,11 +36,11 @@ import static java.util.Objects.requireNonNull;
  */
 public final class ExportPackageFilter implements ElementFilter {
 
+  private static final ObjectMapper CONFIG_MAPPER =
+      new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   private static final Logger LOG = LoggerFactory.getLogger(ExportPackageFilter.class);
-
   private final Map<Archive, ApiBoundary> apiBoundaries = new HashMap<>();
-  private final Map<Element<?>, Boolean> isApiElement = new HashMap<>();
-  private final List<Integer> hashes = new ArrayList<>();
+  private Configuration configuration;
 
   @Override
   public void close() {}
@@ -61,8 +65,16 @@ public final class ExportPackageFilter implements ElementFilter {
 
   @Override
   public void initialize(AnalysisContext analysisContext) {
-    // This is done in order to validate only the elements corresponding to the API archives. The boundaries will be lazily
-    // computed.
+    initializeApiBoundaries(analysisContext);
+    configuration = readConfiguration(analysisContext);
+  }
+
+  /**
+   * This is done in order to validate only elements that are part of API archives and not, for example, Java JDK elements.
+   * 
+   * @param analysisContext This filter's {@link AnalysisContext}.
+   */
+  private void initializeApiBoundaries(AnalysisContext analysisContext) {
     analysisContext.getOldApi().getArchives().forEach(archive -> apiBoundaries.put(archive, null));
     analysisContext.getNewApi().getArchives().forEach(archive -> apiBoundaries.put(archive, null));
   }
@@ -81,6 +93,16 @@ public final class ExportPackageFilter implements ElementFilter {
     return descendInto;
   }
 
+  private Configuration readConfiguration(AnalysisContext analysisContext) {
+    try {
+      Configuration configuration =
+          CONFIG_MAPPER.treeToValue(analysisContext.getConfigurationNode(), Configuration.class);
+      return configuration == null ? new Configuration() : configuration;
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(format("Could not read the filter configuration for [%s].", this.getExtensionId()), e);
+    }
+  }
+
   private ApiBoundary getApiBoundaries(Element<?> element) {
     ApiBoundary apiBoundary;
     if (isJavaMode() || isMixedMode()) {
@@ -89,8 +111,7 @@ public final class ExportPackageFilter implements ElementFilter {
       apiBoundary = getMuleModuleSystemApiBoundary(element.getArchive());
     }
     if (isVerboseLogging()) {
-      // TODO: Replace by a toString in the ApiBoundary and log it here.
-      apiBoundary.logApiPackages();
+      LOG.info(apiBoundary.toString());
     }
     return apiBoundary;
   }
@@ -98,7 +119,7 @@ public final class ExportPackageFilter implements ElementFilter {
   private ApiBoundary getMuleModuleSystemApiBoundary(Archive archive) {
     requireNonNull(archive, "Archive must not be null.");
     if (isMixedMode() || isMuleMode()) {
-      return new MuleModuleSystemApiBoundary(archive);
+      return new CachedApiBoundary(new MuleModuleSystemApiBoundary(archive));
     } else {
       throw new IllegalArgumentException("Mule Module System API boundaries are not supported for the Java Module System mode.");
     }
@@ -106,28 +127,28 @@ public final class ExportPackageFilter implements ElementFilter {
 
   private ApiBoundary getJavaModuleSystemApiBoundary(Element<?> element) {
     if (isJavaMode() || isMixedMode()) {
-      JavaModuleSystemApiBoundary jpmsApiBoundary = new JavaModuleSystemApiBoundary((JavaModelElement) element);
-      // Automatic modules must prioritize MuleModuleSystem descriptors when mode is MIXED.
+      JavaModuleSystemApiBoundary jpmsApiBoundary =
+          new JavaModuleSystemApiBoundary((JavaModelElement) element, configuration.getJpmsExcludedTargets());
+      // Open modules must prioritize MuleModuleSystem descriptors when mode is MIXED.
       if (jpmsApiBoundary.isOpen() && isMixedMode()) {
         ApiBoundary muleModuleSystemApiBoundary = getMuleModuleSystemApiBoundary(element.getArchive());
         if (!muleModuleSystemApiBoundary.isEmpty()) {
-          return muleModuleSystemApiBoundary;
+          return new CachedApiBoundary(muleModuleSystemApiBoundary);
         }
       }
-      return jpmsApiBoundary;
+      return new CachedApiBoundary(jpmsApiBoundary);
     } else {
       throw new IllegalArgumentException("Java Module System API boundaries are not supported for the Mule Module System mode.");
     }
   }
 
+  /**
+   * Determines if an {@link Element} is part of the API.
+   * 
+   * @param element The element that must be checked.
+   * @return True if the element is part of the API.
+   */
   private boolean isApiElement(Element<?> element) {
-
-    // synchronized (isApiElement) {
-    // if (isApiElement.containsKey(element.toString())) {
-    // return isApiElement.get(element.toString());
-    // }
-    // }
-
     boolean isApi = false;
     synchronized (apiBoundaries) {
       if (apiBoundaries.containsKey(element.getArchive())) {
@@ -138,11 +159,6 @@ public final class ExportPackageFilter implements ElementFilter {
     if (isVerboseLogging()) {
       logIsApi(element, isApi);
     }
-
-    // synchronized (isApiElement) {
-    // isApiElement.put(element, isApi);
-    // }
-
     return isApi;
   }
 
@@ -160,5 +176,28 @@ public final class ExportPackageFilter implements ElementFilter {
 
   private void logIsApi(Element<?> element, boolean isApi) {
     LOG.info("{} is {}", element, isApi ? "part of the API" : "NOT part of the API");
+  }
+
+  /**
+   * Filter configuration POJO. Will be instantiated by parsing the filter configuration.
+   */
+  private static class Configuration {
+
+    /**
+     * List of regular expressions. Any jpms target module whose fully qualified name matches an expression defined here will not
+     * be taken into account when defining the module API. This is useful to exclude directed exports to modules that should be
+     * refactored if breaking changes happen.
+     */
+    private List<String> jpmsExcludedTargets = Collections.emptyList();
+
+    public Configuration() {}
+
+    public List<String> getJpmsExcludedTargets() {
+      return jpmsExcludedTargets;
+    }
+
+    public void setJpmsExcludedTargets(List<String> jpmsExcludedTargets) {
+      this.jpmsExcludedTargets = jpmsExcludedTargets;
+    }
   }
 }

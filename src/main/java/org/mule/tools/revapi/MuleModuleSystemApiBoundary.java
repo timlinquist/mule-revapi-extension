@@ -6,6 +6,8 @@
  */
 package org.mule.tools.revapi;
 
+import static java.lang.String.format;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -70,9 +72,9 @@ public class MuleModuleSystemApiBoundary implements ApiBoundary {
   }
 
   @Override
-  public void logApiPackages() {
-    LOG.info("Adding exported packages from Mule Module: {}\nstandard: {}\nprivileged: {}", moduleName, standardPackages,
-             privilegedPackages);
+  public String toString() {
+    return format("Mule Runtime Module System API. Module: %s. Standard packages: %s. Privileged packages: %s", moduleName,
+                  standardPackages, privilegedPackages);
   }
 
   private void loadExportedPackages(Properties muleModuleSystemProperties) {
