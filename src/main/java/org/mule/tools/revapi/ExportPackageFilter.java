@@ -129,8 +129,8 @@ public final class ExportPackageFilter implements ElementFilter {
     if (isJavaMode() || isMixedMode()) {
       JavaModuleSystemApiBoundary jpmsApiBoundary =
           new JavaModuleSystemApiBoundary((JavaModelElement) element, configuration.getJpmsExcludedTargets());
-      // Open modules must prioritize MuleModuleSystem descriptors when mode is MIXED.
-      if (jpmsApiBoundary.isOpen() && isMixedMode()) {
+      // Automatic modules must prioritize MuleModuleSystem descriptors when mode is MIXED.
+      if (jpmsApiBoundary.isAutomatic() && isMixedMode()) {
         ApiBoundary muleModuleSystemApiBoundary = getMuleModuleSystemApiBoundary(element.getArchive());
         if (!muleModuleSystemApiBoundary.isEmpty()) {
           return new CachedApiBoundary(muleModuleSystemApiBoundary);
