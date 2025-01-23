@@ -54,7 +54,8 @@ public class MuleModuleSystemApiBoundary implements ApiBoundary {
         }
       }
     } catch (IOException e) {
-      LOG.debug("Failed to open the archive {} as a jar.", archive.getName(), e);
+      LOG.error("Failed to open the archive {} as a jar.", archive.getName(), e);
+      throw new RuntimeException(e);
     }
     LOG.debug("No Mule Module System descriptor found for the archive {}.", archive.getName());
   }

@@ -71,14 +71,15 @@ public class JavaModuleSystemApiBoundary implements ApiBoundary {
       while ((entry = jarFile.getNextJarEntry()) != null) {
         String name = entry.getName();
         if (name.equals("module-info.class")) {
-          return true;
+          return false;
         }
       }
     } catch (IOException e) {
-      LOG.debug("Failed to open the archive {} as a jar.", moduleArchive.getName(), e);
+      LOG.error("Failed to open the archive {} as a jar.", moduleArchive.getName(), e);
+      throw new RuntimeException(e);
     }
     LOG.debug("No Java Module System descriptor found for the archive {}.", moduleArchive.getName());
-    return false;
+    return true;
   }
 
   @Override
