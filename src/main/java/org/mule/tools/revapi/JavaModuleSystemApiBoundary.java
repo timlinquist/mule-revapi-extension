@@ -7,6 +7,7 @@
 package org.mule.tools.revapi;
 
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toSet;
 
 import org.revapi.Archive;
 import org.revapi.java.spi.JavaModelElement;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 import java.util.regex.Pattern;
@@ -34,15 +36,15 @@ public class JavaModuleSystemApiBoundary implements ApiBoundary {
 
   private final Archive moduleArchive;
   private final ModuleElement moduleElement;
-  private final List<String> exportedPackages;
+  private final Set<String> exportedPackages;
 
   public JavaModuleSystemApiBoundary(JavaModelElement element, List<String> excludedTargets) {
     this.moduleArchive = element.getArchive();
     this.moduleElement = element.getTypeEnvironment().getElementUtils().getModuleOf(element.getDeclaringElement());
     this.exportedPackages =
-        moduleElement.getDirectives().stream().map(directive -> directive.accept(new IsApiDirective(excludedTargets), null))
+        moduleElement.getDirectives().stream().map(directive -> directive.accept(new ApiPackagesFilter(excludedTargets), null))
             .filter(Objects::nonNull)
-            .toList();
+            .collect(toSet());
   }
 
   @Override
@@ -91,7 +93,7 @@ public class JavaModuleSystemApiBoundary implements ApiBoundary {
   /**
    * A jpms module directive visitor that can return the packages that are part of a jpms module API boundary.
    */
-  private static class IsApiDirective implements ModuleElement.DirectiveVisitor<String, Void> {
+  private static class ApiPackagesFilter implements ModuleElement.DirectiveVisitor<String, Void> {
 
     private final List<Pattern> excludedTargets;
 
@@ -100,7 +102,7 @@ public class JavaModuleSystemApiBoundary implements ApiBoundary {
      * 
      * @param excludedTargets List of regular expressions that will exclude any export that only targets matching modules.
      */
-    public IsApiDirective(List<String> excludedTargets) {
+    public ApiPackagesFilter(List<String> excludedTargets) {
       this.excludedTargets = excludedTargets.stream().map(Pattern::compile).toList();
     }
 
@@ -120,20 +122,22 @@ public class JavaModuleSystemApiBoundary implements ApiBoundary {
     @Override
     public String visitExports(ModuleElement.ExportsDirective d, Void unused) {
       boolean isApi = d.getTargetModules() == null
-          || d.getTargetModules().stream()
-              .anyMatch(moduleElement -> excludedTargets.stream()
-                  .noneMatch(pattern -> pattern.matcher(moduleElement.getQualifiedName()).matches()));
-      if (isApi) {
-        return d.getPackage().getQualifiedName().toString();
-      } else {
-        return null;
-      }
+          || containsUnExcludedTargets(d.getTargetModules());
+      return isApi ? d.getPackage().getQualifiedName().toString() : null;
     }
 
+    /**
+     * Visits a jpms opens directive in order to determine if the package should be part of the jpms module API or not.
+     *
+     * @param d      The visited jpms opens directive (visitor pattern).
+     * @param unused This parameter is not used (visitor pattern).
+     * @return The opened package if it should be part of the jpms module API, null otherwise.
+     */
     @Override
     public String visitOpens(ModuleElement.OpensDirective d, Void unused) {
-      // Nothing to do.
-      return null;
+      boolean isApi = d.getTargetModules() == null
+          || containsUnExcludedTargets(d.getTargetModules());
+      return isApi ? d.getPackage().getQualifiedName().toString() : null;
     }
 
     @Override
@@ -144,8 +148,14 @@ public class JavaModuleSystemApiBoundary implements ApiBoundary {
 
     @Override
     public String visitProvides(ModuleElement.ProvidesDirective d, Void unused) {
-      // Nothing to do.
+      // TODO: What should we do here?
       return null;
+    }
+
+    private boolean containsUnExcludedTargets(List<? extends ModuleElement> targetModules) {
+      return targetModules.stream()
+          .anyMatch(moduleElement -> excludedTargets.stream()
+              .noneMatch(pattern -> pattern.matcher(moduleElement.getQualifiedName()).matches()));
     }
   }
 }

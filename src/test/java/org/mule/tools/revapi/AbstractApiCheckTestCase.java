@@ -79,7 +79,7 @@ public abstract class AbstractApiCheckTestCase {
                                                "-Dmaven.repo.local=" + getProperty("maven.repo.local", ""),
                                                "-Dmaven.compiler.source=" + sourceLevel,
                                                "-Dmaven.compiler.target=" + sourceLevel,
-                                               "-Dmule.revapi.moduleSystem.mode=MULE")
+                                               "-Dmule.revapi.moduleSystem.mode=JAVA")
         .build();
     this.folder = folder;
   }
