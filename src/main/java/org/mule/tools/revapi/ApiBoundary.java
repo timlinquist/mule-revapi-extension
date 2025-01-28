@@ -22,7 +22,7 @@ public interface ApiBoundary {
   }
 
   /**
-   * @param element The element that is going to be checked.
+   * @param element The element that is going to be checked
    * @return True if the element is part of the API.
    */
   boolean isApi(JavaTypeElement element);

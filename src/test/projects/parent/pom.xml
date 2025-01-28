@@ -57,6 +57,13 @@
                                             },
                                             "passThroughDifference": ["java.class.nonPublicPartOfAPI"]
                                         }
+                                    },
+                                    "mule": {
+                                        "module": {
+                                            "filter": {
+                                                "moduleSystemStrategy": "MULE"
+                                            }
+                                        }
                                     }
                                 }
                     ]]></analysisConfiguration>

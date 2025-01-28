@@ -7,7 +7,6 @@
 package org.mule.tools.revapi;
 
 import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
 
 import java.io.Reader;
 import java.util.Collections;
@@ -31,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * Filters elements that are not part of a given Mule module API, so the API modification checks are not executed on them.
  * <p/>
  * This filter considers both standard and privileged APIs by merging them into a single API.
- *
+ * 
  * @since 1.0
  */
 public final class ExportPackageFilter implements ElementFilter {
@@ -47,10 +46,6 @@ public final class ExportPackageFilter implements ElementFilter {
 
   private static boolean isVerboseLogging() {
     return System.getProperty("mule.revapi.verbose") != null;
-  }
-
-  private static String getModuleSystemMode() {
-    return System.getProperty("mule.revapi.moduleSystem.mode", "MIXED");
   }
 
   @Override
@@ -103,43 +98,13 @@ public final class ExportPackageFilter implements ElementFilter {
     }
   }
 
-  private ApiBoundary getApiBoundaries(Element<?> element) {
-    ApiBoundary apiBoundary;
-    if (isJavaMode() || isMixedMode()) {
-      apiBoundary = getJavaModuleSystemApiBoundary(element);
-    } else {
-      apiBoundary = getMuleModuleSystemApiBoundary(element.getArchive());
-    }
+  private ApiBoundary getApiBoundary(Element<?> element, Configuration configuration) {
+    ApiBoundary apiBoundary =
+        new CachedApiBoundary(configuration.getModuleSystemStrategy().getApiBoundary(element, configuration));
     if (isVerboseLogging()) {
       LOG.info(apiBoundary.toString());
     }
     return apiBoundary;
-  }
-
-  private ApiBoundary getMuleModuleSystemApiBoundary(Archive archive) {
-    requireNonNull(archive, "Archive must not be null.");
-    if (isMixedMode() || isMuleMode()) {
-      return new CachedApiBoundary(new MuleModuleSystemApiBoundary(archive));
-    } else {
-      throw new IllegalArgumentException("Mule Module System API boundaries are not supported for the Java Module System mode.");
-    }
-  }
-
-  private ApiBoundary getJavaModuleSystemApiBoundary(Element<?> element) {
-    if (isJavaMode() || isMixedMode()) {
-      JavaModuleSystemApiBoundary jpmsApiBoundary =
-          new JavaModuleSystemApiBoundary((JavaModelElement) element, configuration.getJpmsExcludedTargets());
-      // Automatic modules must prioritize MuleModuleSystem descriptors when mode is MIXED.
-      if (jpmsApiBoundary.isAutomatic() && isMixedMode()) {
-        ApiBoundary muleModuleSystemApiBoundary = getMuleModuleSystemApiBoundary(element.getArchive());
-        if (!muleModuleSystemApiBoundary.isEmpty()) {
-          return new CachedApiBoundary(muleModuleSystemApiBoundary);
-        }
-      }
-      return new CachedApiBoundary(jpmsApiBoundary);
-    } else {
-      throw new IllegalArgumentException("Java Module System API boundaries are not supported for the Mule Module System mode.");
-    }
   }
 
   /**
@@ -150,11 +115,9 @@ public final class ExportPackageFilter implements ElementFilter {
    */
   private boolean isApiElement(Element<?> element) {
     boolean isApi = false;
-    synchronized (apiBoundaries) {
-      if (apiBoundaries.containsKey(element.getArchive())) {
-        isApi = apiBoundaries.computeIfAbsent(element.getArchive(), archive -> getApiBoundaries(element))
-            .isApi(element);
-      }
+    if (apiBoundaries.containsKey(element.getArchive())) {
+      isApi = apiBoundaries.computeIfAbsent(element.getArchive(), archive -> getApiBoundary(element, configuration))
+          .isApi(element);
     }
     if (isVerboseLogging()) {
       logIsApi(element, isApi);
@@ -162,18 +125,12 @@ public final class ExportPackageFilter implements ElementFilter {
     return isApi;
   }
 
-  private boolean isMixedMode() {
-    return getModuleSystemMode().equals("MIXED");
-  }
-
-  private boolean isMuleMode() {
-    return getModuleSystemMode().equals("MULE");
-  }
-
-  private boolean isJavaMode() {
-    return getModuleSystemMode().equals("JAVA");
-  }
-
+  /**
+   * Logs whether an element is part of an API.
+   * 
+   * @param element The element.
+   * @param isApi   True if the element is part of the API.
+   */
   private void logIsApi(Element<?> element, boolean isApi) {
     LOG.info("{} is {}", element, isApi ? "part of the API" : "NOT part of the API");
   }
@@ -183,21 +140,85 @@ public final class ExportPackageFilter implements ElementFilter {
    */
   private static class Configuration {
 
-    /**
-     * List of regular expressions. Any jpms target module whose fully qualified name matches an expression defined here will not
-     * be taken into account when defining the module API. This is useful to exclude directed exports to modules that should be
-     * refactored if breaking changes happen.
-     */
     private List<String> jpmsExcludedTargets = Collections.emptyList();
+    private ModuleSystemStrategy moduleSystemStrategy = ModuleSystemStrategy.MIXED;
 
     public Configuration() {}
 
+    /**
+     * @return A List of regular expressions. Any jpms target module whose fully qualified name matches an expression defined here
+     *         will not be taken into account when defining the module API. This is useful to exclude directed exports to modules
+     *         that can tolerate breaking changes via refactor.
+     */
     public List<String> getJpmsExcludedTargets() {
       return jpmsExcludedTargets;
+    }
+
+    /**
+     * @return One of the following module system strategies:</br>
+     *         MIXED: Prioritizes JPMS but will try to switch to MMS if the JPMS module is an automatic one.</br>
+     *         JAVA: JPMS Only.</br>
+     *         MULE: MMS only.</br>
+     */
+    public ModuleSystemStrategy getModuleSystemStrategy() {
+      return moduleSystemStrategy;
     }
 
     public void setJpmsExcludedTargets(List<String> jpmsExcludedTargets) {
       this.jpmsExcludedTargets = jpmsExcludedTargets;
     }
+
+    public void setModuleSystemStrategy(String moduleSystemStrategy) {
+      this.moduleSystemStrategy = ModuleSystemStrategy.valueOf(moduleSystemStrategy);
+    }
+  }
+
+  /**
+   * Enumeration of the possible module system strategies: MIXED: Prioritizes JPMS but will try to switch to MMS if the JPMS
+   * module is an automatic one.</br>
+   * JAVA: JPMS Only.</br>
+   * MULE: MMS only.</br>
+   * Strategies can create {@link ApiBoundary} instances via {@link #getApiBoundary(Element, Configuration)}.
+   */
+  private enum ModuleSystemStrategy {
+
+    MIXED() {
+
+      @Override
+      public ApiBoundary getApiBoundary(Element<?> element, Configuration configuration) {
+        JavaModuleSystemApiBoundary jpmsApiBoundary = (JavaModuleSystemApiBoundary) JAVA.getApiBoundary(element, configuration);
+        // Automatic modules must prioritize MuleModuleSystem descriptors when mode is MIXED.
+        if (jpmsApiBoundary.isAutomatic()) {
+          ApiBoundary muleModuleSystemApiBoundary = new MuleModuleSystemApiBoundary(element.getArchive());
+          if (!muleModuleSystemApiBoundary.isEmpty()) {
+            return muleModuleSystemApiBoundary;
+          }
+        }
+        return jpmsApiBoundary;
+      }
+    },
+    JAVA {
+
+      @Override
+      public JavaModuleSystemApiBoundary getApiBoundary(Element<?> element, Configuration configuration) {
+        return new JavaModuleSystemApiBoundary((JavaModelElement) element, configuration.getJpmsExcludedTargets());
+      }
+    },
+    MULE {
+
+      @Override
+      public ApiBoundary getApiBoundary(Element<?> element, Configuration configuration) {
+        return new MuleModuleSystemApiBoundary(element.getArchive());
+      }
+    };
+
+    /**
+     * Creates an {@link ApiBoundary} instance.
+     * 
+     * @param element       Element that will be used to determine the boundary.
+     * @param configuration This filter configuration.
+     * @return ApiBoundary that corresponds to the provided element.
+     */
+    public abstract ApiBoundary getApiBoundary(Element<?> element, Configuration configuration);
   }
 }

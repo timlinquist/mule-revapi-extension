@@ -78,8 +78,7 @@ public abstract class AbstractApiCheckTestCase {
     this.mavenRuntime = builder.withCliOptions("--batch-mode",
                                                "-Dmaven.repo.local=" + getProperty("maven.repo.local", ""),
                                                "-Dmaven.compiler.source=" + sourceLevel,
-                                               "-Dmaven.compiler.target=" + sourceLevel,
-                                               "-Dmule.revapi.moduleSystem.mode=MULE")
+                                               "-Dmaven.compiler.target=" + sourceLevel)
         .build();
     this.folder = folder;
   }
